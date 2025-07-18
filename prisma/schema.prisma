@@ -1,0 +1,340 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Result {
+  id                  String     @id @default(cuid())
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @default(now()) @updatedAt
+  score               Float
+  totalCorrectAnswers Int
+  timeSpent           Int
+  userId              String
+  assessmentId        String
+  user                User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessment          Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, assessmentId])
+}
+
+model Assessment {
+  id             String      @id @default(cuid())
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @default(now()) @updatedAt
+  bookName       String?
+  name           String
+  totalQuestions Int
+  duration       Int
+  isPublic       Boolean     @default(false)
+  sectionType    SectionType @default(READING)
+  audioPath      String?
+  essayParts     EssayPart[]
+  parts          Part[]
+  questions      Question[]
+  results        Result[]
+  userEssays     UserEssay[]
+}
+
+model Part {
+  id             String          @id @default(cuid())
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @default(now()) @updatedAt
+  title          String
+  description    String
+  order          Int
+  assessmentId   String
+  assessment     Assessment      @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  passage        Passage?
+  questions      Question[]
+  questionGroups QuestionGroup[]
+  essayPart      EssayPart?
+}
+
+model QuestionGroup {
+  id                  String                      @id @default(cuid())
+  createdAt           DateTime                    @default(now())
+  updatedAt           DateTime                    @default(now()) @updatedAt
+  title               String
+  description         String?
+  startQuestionNumber Int
+  endQuestionNumber   Int
+  type                QuestionType
+  partId              String
+  completion          Completion?
+  identifyInfoList    IdentifyingInformation[]
+  matching            Matching?
+  multiMoreList       MultipleChoiceMoreAnswers[]
+  multiOneList        MultipleChoiceOneAnswer[]
+  questions           Question[]
+  part                Part                        @relation(fields: [partId], references: [id], onDelete: Cascade)
+}
+
+model Question {
+  id              String                     @id @default(cuid())
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @default(now()) @updatedAt
+  questionNumber  Int
+  correctAnswer   String
+  respond         String?
+  questionGroupId String
+  partId          String
+  assessmentId    String
+  completionId    String?
+  identifyInfo    IdentifyingInformation?
+  matchingChoice  MatchingChoice?
+  multiMore       MultipleChoiceMoreAnswers?
+  multiOne        MultipleChoiceOneAnswer?
+  assessment      Assessment                 @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  completion      Completion?                @relation(fields: [completionId], references: [id])
+  part            Part                       @relation(fields: [partId], references: [id], onDelete: Cascade)
+  questionGroup   QuestionGroup              @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
+
+  @@unique([assessmentId, questionNumber])
+}
+
+model MultipleChoiceOneAnswer {
+  id              String        @id @default(cuid())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
+  title           String
+  questionId      String        @unique
+  questionGroupId String
+  choices         Choice[]
+  questionGroup   QuestionGroup @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
+  question        Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model MultipleChoiceMoreAnswers {
+  id              String        @id @default(cuid())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
+  title           String
+  expectedAnswers String[]
+  questionId      String        @unique
+  questionGroupId String
+  choices         Choice[]
+  questionGroup   QuestionGroup @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
+  question        Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model Choice {
+  id          String                     @id @default(cuid())
+  createdAt   DateTime                   @default(now())
+  updatedAt   DateTime                   @default(now()) @updatedAt
+  content     String
+  isCorrect   Boolean
+  order       Int
+  multiOneId  String?
+  multiMoreId String?
+  multiMore   MultipleChoiceMoreAnswers? @relation(fields: [multiMoreId], references: [id], onDelete: Cascade)
+  multiOne    MultipleChoiceOneAnswer?   @relation(fields: [multiOneId], references: [id], onDelete: Cascade)
+}
+
+model IdentifyingInformation {
+  id              String         @id @default(cuid())
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @default(now()) @updatedAt
+  title           String
+  choiceCorrect   IdentifyChoice
+  questionId      String         @unique
+  questionGroupId String
+  questionGroup   QuestionGroup  @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
+  question        Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model Completion {
+  id              String        @id @default(cuid())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
+  paragraph       String
+  questionGroupId String        @unique
+  questionGroup   QuestionGroup @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
+  questions       Question[]
+}
+
+model Matching {
+  id                 String           @id @default(cuid())
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @default(now()) @updatedAt
+  paragraph          String
+  titleForQuestion   String?
+  questionGroupId    String           @unique
+  questionGroup      QuestionGroup    @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
+  matchingChoiceList MatchingChoice[]
+}
+
+model MatchingChoice {
+  id         String    @id @default(cuid())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now()) @updatedAt
+  content    String
+  questionId String?   @unique
+  matchingId String
+  matching   Matching  @relation(fields: [matchingId], references: [id], onDelete: Cascade)
+  question   Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model PassageHeading {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  title     String
+  content   String
+  order     Int
+  passageId String
+  passage   Passage  @relation(fields: [passageId], references: [id], onDelete: Cascade)
+}
+
+model Passage {
+  id                 String           @id @default(cuid())
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @default(now()) @updatedAt
+  title              String
+  description        String?
+  image              String?
+  type               PassageType
+  content            String?
+  partId             String           @unique
+  part               Part             @relation(fields: [partId], references: [id], onDelete: Cascade)
+  passageHeadingList PassageHeading[]
+}
+
+model User {
+  id                    String                 @id @default(cuid())
+  name                  String?
+  email                 String?                @unique
+  emailVerified         DateTime?
+  image                 String?
+  password              String?
+  role                  UserRole               @default(USER)
+  isTwoFactorEnabled    Boolean                @default(false)
+  accounts              Account[]
+  results               Result[]
+  twoFactorConfirmation TwoFactorConfirmation?
+  teacherAssessments    UserEssay[]            @relation("TeacherAssessments")
+  userEssays            UserEssay[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model VerificationToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model PasswordResetToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model TwoFactorToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model TwoFactorConfirmation {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EssayPart {
+  id           String     @id @default(cuid())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now()) @updatedAt
+  partNumber   Int
+  topic        String
+  title        String
+  description  String
+  image        String?
+  maxWords     Int        @default(250)
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  partId       String     @unique
+  part         Part       @relation(fields: [partId], references: [id], onDelete: Cascade)
+}
+
+model UserEssay {
+  id           String     @id @default(cuid())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now()) @updatedAt
+  part1Result  String?
+  part2Result  String?
+  score        Float?
+  isAssessed   Boolean    @default(false)
+  userId       String
+  assessmentId String
+  teacherId    String?
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  teacher      User?      @relation("TeacherAssessments", fields: [teacherId], references: [id])
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, assessmentId])
+}
+
+enum SectionType {
+  READING
+  LISTENING
+  WRITING
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE_ONE_ANSWER
+  MULTIPLE_CHOICE_MORE_ANSWERS
+  IDENTIFYING_INFORMATION
+  COMPLETION
+  TABLE_COMPLETION
+  MATCHING
+  MATCHING_HEADING
+}
+
+enum IdentifyChoice {
+  TRUE
+  FALSE
+  NOT_GIVEN
+}
+
+enum PassageType {
+  PASSAGE_SIMPLE
+  PASSAGE_MULTI_HEADING
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  TEACHER
+}

@@ -3,12 +3,13 @@
 import { useEffect, useTransition } from 'react';
 import { updateMultiMore } from '@/actions/question-type/multiple-choice/multi-more';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { Plus, Trash2 } from 'lucide-react';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { useEditHook } from '@/global/use-edit-hook';
 import { catchError } from '@/lib/utils';
-import { MultiMoreSchema } from '@/lib/validations/question-type';
+import { MultiMoreUpdateSchema } from '@/lib/validations/question-type';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContentWithScrollArea } from '@/components/ui/dialog';
@@ -28,26 +29,39 @@ export function MultiMoreUpdateForm() {
   const { onClose, isOpen, type, data } = useEditHook();
   const isModalOpen = isOpen && type === 'editMultiMore';
   const multiMore = data?.multiMore;
-  const form = useForm<z.infer<typeof MultiMoreSchema>>({
-    resolver: zodResolver(MultiMoreSchema),
+
+  const form = useForm<z.infer<typeof MultiMoreUpdateSchema>>({
+    resolver: zodResolver(MultiMoreUpdateSchema),
     defaultValues: {
-      title: ''
+      title: '',
+      choices: []
     }
   });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'choices'
+  });
+
   useEffect(() => {
     if (multiMore) {
-      const correctChoiceIdList = multiMore.choices
-        .filter((choice) => choice.isCorrect)
-        .map((choice) => choice.id);
-
       form.setValue('title', multiMore.title);
-      form.setValue('choiceIdList', correctChoiceIdList);
+      form.setValue(
+        'choices',
+        multiMore.choices.map((choice) => ({
+          id: choice.id,
+          content: choice.content,
+          isCorrect: choice.isCorrect
+        }))
+      );
     }
   }, [form, multiMore]);
+
   if (!multiMore || !isModalOpen) {
     return null;
   }
-  const onSubmit = (values: z.infer<typeof MultiMoreSchema>) => {
+
+  const onSubmit = (values: z.infer<typeof MultiMoreUpdateSchema>) => {
     startTransition(async () => {
       try {
         await updateMultiMore({
@@ -61,6 +75,19 @@ export function MultiMoreUpdateForm() {
         catchError(err);
       }
     });
+  };
+
+  const addChoice = () => {
+    append({
+      content: '',
+      isCorrect: false
+    });
+  };
+
+  const removeChoice = (index: number) => {
+    if (fields.length > 3) {
+      remove(index);
+    }
   };
   return (
     <Dialog onOpenChange={onClose} open={isModalOpen}>
@@ -78,68 +105,92 @@ export function MultiMoreUpdateForm() {
                       <Input
                         {...field}
                         disabled={isPending}
-                        placeholder="Hello"
+                        placeholder="Enter question title"
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="choiceIdList"
-                render={() => (
-                  <FormItem>
-                    <div className="mb-4">
-                      <FormLabel className="text-base">Sidebar</FormLabel>
-                      <FormDescription>
-                        Select the items you want to display in the sidebar.
-                      </FormDescription>
-                    </div>
-                    {multiMore.choices.map((choice) => (
+
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <FormLabel className="text-base">Answer Choices</FormLabel>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addChoice}
+                    disabled={isPending}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Choice
+                  </Button>
+                </div>
+                <FormDescription className="mb-4">
+                  Select exactly 2 choices as correct answers. This question
+                  type requires exactly 2 correct options.
+                </FormDescription>
+
+                {fields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    className="space-y-2 p-4 border rounded-lg"
+                  >
+                    <div className="flex items-center space-x-2">
                       <FormField
-                        key={choice.id}
                         control={form.control}
-                        name="choiceIdList"
-                        render={({ field }) => {
-                          return (
-                            <FormItem
-                              key={choice.id}
-                              className="flex flex-row items-start space-x-3 space-y-0"
-                            >
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(choice.id)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([
-                                          ...field.value,
-                                          choice.id
-                                        ])
-                                      : field.onChange(
-                                          field.value?.filter(
-                                            (value) => value !== choice.id
-                                          )
-                                        );
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                {choice.content}
-                              </FormLabel>
-                            </FormItem>
-                          );
-                        }}
+                        name={`choices.${index}.content`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder={`Choice ${index + 1}`}
+                                disabled={isPending}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    ))}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+
+                      <FormField
+                        control={form.control}
+                        name={`choices.${index}.isCorrect`}
+                        render={({ field }) => (
+                          <FormItem className="flex items-center space-x-2">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={isPending}
+                              />
+                            </FormControl>
+                            <FormLabel className="text-sm font-normal">
+                              Correct
+                            </FormLabel>
+                          </FormItem>
+                        )}
+                      />
+
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeChoice(index)}
+                        disabled={isPending || fields.length <= 3}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <Button disabled={isPending} type="submit" className="w-full">
-              update
+              Update Multiple Choice
             </Button>
           </form>
         </Form>

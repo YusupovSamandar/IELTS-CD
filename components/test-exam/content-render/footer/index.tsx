@@ -29,8 +29,8 @@ function FooterContentRender() {
             key={part.id}
             className={cn(
               'flex-1 rounded-none border-none h-12 transition-all',
-              activeTab === part.id 
-                ? 'bg-primary text-primary-foreground shadow-md border-b-2 border-primary' 
+              activeTab === part.id
+                ? 'bg-primary text-primary-foreground shadow-md border-b-2 border-primary'
                 : 'hover:bg-muted hover:text-foreground'
             )}
             variant={activeTab === part.id ? 'default' : 'outline'}

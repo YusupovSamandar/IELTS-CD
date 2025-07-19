@@ -77,4 +77,21 @@ export const QuestionGroupSchema = z
         'For TABLE_COMPLETION type, numberColumns and numberRows must be provided',
       path: ['type']
     }
+  )
+  .refine(
+    (data) => {
+      if (data.type === QuestionType.MULTIPLE_CHOICE_MORE_ANSWERS) {
+        const totalQuestions =
+          data.endQuestionNumber - data.startQuestionNumber + 1;
+        if (totalQuestions % 2 !== 0) {
+          return false;
+        }
+      }
+      return true;
+    },
+    {
+      message:
+        'Multiple Choice More Answers requires an even number of questions (questions are paired: 5-6, 7-8, etc.)',
+      path: ['endQuestionNumber']
+    }
   );

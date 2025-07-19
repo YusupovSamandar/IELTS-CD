@@ -67,9 +67,7 @@ export const createQuestionGroup = async ({
       await createMultiOneList(questionGroup, part.assessmentId);
       break;
     case 'MULTIPLE_CHOICE_MORE_ANSWERS':
-      await createMultiMoreList({
-        questionGroupId: questionGroup.id
-      });
+      await createMultiMoreList(questionGroup, part.assessmentId);
       break;
     case 'IDENTIFYING_INFORMATION':
       await createIdentifyInfoList(questionGroup, part.assessmentId);

@@ -94,11 +94,27 @@ export const useExamHandler = () => {
           break;
 
         case 'MULTI_MORE':
+          let correctChoicesSelected = 0;
+          let incorrectChoicesSelected = 0;
+
           for (const choiceId of userAnswer.choiceIdList) {
             const choiceCorrect = await isChoiceCorrect(choiceId);
             if (choiceCorrect) {
-              totalCorrectAnswers++;
+              correctChoicesSelected++;
+            } else {
+              incorrectChoicesSelected++;
             }
+          }
+
+          // Score based on correct answers only (no penalty for wrong choices)
+          // If user selects both correct answers = 2 points
+          // If user selects 1 correct answer = 1 point
+          // If user selects 0 correct answers = 0 points
+          if (incorrectChoicesSelected === 0) {
+            totalCorrectAnswers += correctChoicesSelected; // 0, 1, or 2 points
+          } else {
+            // If any incorrect choice is selected, only count correct ones
+            totalCorrectAnswers += correctChoicesSelected;
           }
           break;
 
@@ -164,7 +180,6 @@ export const useExamHandler = () => {
     setSubmitProgress,
     timeRemaining,
     essayValues,
-    router,
     setMode
   ]);
   function handleQuestionSelected(questionNumber: number) {

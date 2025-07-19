@@ -128,12 +128,23 @@ export function CreateQuestionGroupForm() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="">
-                        {Object.values(QuestionType).map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type.replace(/_/g, ' ')}{' '}
-                            {/* Convert underscores to spaces */}
-                          </SelectItem>
-                        ))}
+                        {Object.values(QuestionType)
+                          .filter((type) => {
+                            // Remove IDENTIFYING_INFORMATION from LISTENING assessments
+                            if (
+                              selectedAssessment?.sectionType === 'LISTENING' &&
+                              type === 'IDENTIFYING_INFORMATION'
+                            ) {
+                              return false;
+                            }
+                            return true;
+                          })
+                          .map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {type.replace(/_/g, ' ')}{' '}
+                              {/* Convert underscores to spaces */}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />

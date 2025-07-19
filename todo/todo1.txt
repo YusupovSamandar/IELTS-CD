@@ -1,0 +1,2 @@
+1. Multiple choice more answers not working. User should be able to select 2 answers from given options. The order does not matter. 
+2. Multiple choice one or more asnwer: option to add more options and remove them. starts with 3 options by default and + add option button to add more options. if it needs schema changed do it.

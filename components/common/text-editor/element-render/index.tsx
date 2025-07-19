@@ -77,15 +77,36 @@ export const ElementRender = (props: ReadonlyElementRenderProps) => {
         </ul>
       );
     case 'heading-one':
+      const h1AlignClass = element.align
+        ? {
+            left: 'text-left',
+            center: 'text-center',
+            right: 'text-right',
+            justify: 'text-justify'
+          }[element.align]
+        : '';
+
       return (
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+        <h1
+          className={`scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl ${h1AlignClass}`}
+          {...attributes}
+        >
           {children}
         </h1>
       );
     case 'heading-two':
+      const h2AlignClass = element.align
+        ? {
+            left: 'text-left',
+            center: 'text-center',
+            right: 'text-right',
+            justify: 'text-justify'
+          }[element.align]
+        : '';
+
       return (
         <h2
-          className="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
+          className={`mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0 ${h2AlignClass}`}
           {...attributes}
         >
           {children}
@@ -95,7 +116,22 @@ export const ElementRender = (props: ReadonlyElementRenderProps) => {
       return <li {...attributes}>{children}</li>;
     case 'numbered-list':
       return <ol {...attributes}>{children}</ol>;
+    case 'paragraph':
     default:
-      return <span {...attributes}>{children}</span>;
+      // Handle paragraphs and default elements with proper alignment
+      const alignmentClass = element.align
+        ? {
+            left: 'text-left',
+            center: 'text-center',
+            right: 'text-right',
+            justify: 'text-justify'
+          }[element.align]
+        : '';
+
+      return (
+        <p className={alignmentClass} {...attributes}>
+          {children}
+        </p>
+      );
   }
 };

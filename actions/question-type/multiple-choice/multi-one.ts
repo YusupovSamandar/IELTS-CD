@@ -6,7 +6,10 @@ import { z } from 'zod';
 import { CHOICE_OPTIONS } from '@/config/constants';
 import { db } from '@/lib/db';
 import { getTotalQuestions } from '@/lib/utils';
-import { MultiOneSchema } from '@/lib/validations/question-type';
+import {
+  MultiOneSchema,
+  MultiOneUpdateSchema
+} from '@/lib/validations/question-type';
 
 export const createMultiOneList = async (
   questionGroup: QuestionGroup,
@@ -48,46 +51,76 @@ export const updateMultiOne = async ({
   formData,
   id
 }: {
-  formData: z.infer<typeof MultiOneSchema>;
+  formData: z.infer<typeof MultiOneUpdateSchema>;
   id: string;
 }) => {
-  const { title, ...rest } = formData;
+  const { title, choices } = formData;
 
-  // Find the multiOne record
   const multiOne = await db.multipleChoiceOneAnswer.findUnique({
     where: { id },
-    select: { question: { select: { assessmentId: true } } }
+    select: {
+      question: { select: { assessmentId: true } },
+      choices: { select: { id: true } }
+    }
   });
 
-  // Throw an error if multiOne is not found
   if (!multiOne) {
     throw new Error('MultiOne ID not found');
   }
 
-  // Update the selected choice to be correct
+  // Update the title
   await db.multipleChoiceOneAnswer.update({
     where: { id },
-    data: {
-      title,
-      choices: {
-        update: {
-          where: { id: rest.choiceId },
-          data: { isCorrect: true }
+    data: { title }
+  });
+
+  // Get existing choice IDs
+  const existingChoiceIds = multiOne.choices.map((choice) => choice.id);
+
+  // Process each choice
+  for (const choice of choices) {
+    if (choice.id && existingChoiceIds.includes(choice.id)) {
+      // Update existing choice
+      await db.choice.update({
+        where: { id: choice.id },
+        data: {
+          content: choice.content,
+          isCorrect: choice.isCorrect
         }
-      }
+      });
+    } else {
+      // Create new choice
+      const maxOrder = await db.choice.findFirst({
+        where: { multiOneId: id },
+        orderBy: { order: 'desc' },
+        select: { order: true }
+      });
+
+      await db.choice.create({
+        data: {
+          content: choice.content,
+          isCorrect: choice.isCorrect,
+          order: (maxOrder?.order ?? -1) + 1,
+          multiOneId: id
+        }
+      });
     }
-  });
+  }
 
-  // Update other choices to remove the correct flag
-  await db.choice.updateMany({
-    where: {
-      NOT: { id: rest.choiceId },
-      multiOneId: id
-    },
-    data: { isCorrect: false }
-  });
+  // Delete choices that are no longer in the form
+  const submittedChoiceIds = choices.filter((c) => c.id).map((c) => c.id);
+  const choicesToDelete = existingChoiceIds.filter(
+    (id) => !submittedChoiceIds.includes(id)
+  );
 
-  // Revalidate the path
+  if (choicesToDelete.length > 0) {
+    await db.choice.deleteMany({
+      where: {
+        id: { in: choicesToDelete }
+      }
+    });
+  }
+
   revalidatePath(`/assessments/${multiOne.question.assessmentId}`);
 };
 export const isChoiceCorrect = async (choiceId: string) => {

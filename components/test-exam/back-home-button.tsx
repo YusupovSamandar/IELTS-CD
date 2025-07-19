@@ -8,8 +8,8 @@ export default function BackHomeButton() {
   const router = useRouter();
 
   return (
-    <Button 
-      variant="outline" 
+    <Button
+      variant="outline"
       size="sm"
       onClick={() => router.push('/')}
       className="gap-2 mr-4 text-muted-foreground hover:text-foreground"

@@ -1,65 +1,49 @@
-import NextAuth, { DefaultSession, Session } from "next-auth"
-import authConfig from "@/auth.config"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { db } from "./lib/db"
-import { getUserById } from "./actions/database/user"
-import { UserRole } from "@prisma/client"
-import { getAccountByUserId } from "./actions/database/acount"
+import authConfig from '@/auth.config';
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import { UserRole } from '@prisma/client';
+import NextAuth, { DefaultSession, Session } from 'next-auth';
+import { getAccountByUserId } from './actions/database/acount';
+import { getUserById } from './actions/database/user';
+import { db } from './lib/db';
 
-export type ExtendedUser = DefaultSession["user"] & {
+export type ExtendedUser = DefaultSession['user'] & {
   role: UserRole;
   isTwoFactorEnabled: boolean;
   isOAuth: boolean;
 };
 
-declare module "next-auth" {
+declare module 'next-auth' {
   interface Session {
     user: ExtendedUser;
-    
   }
 }
 
 export const {
-  handlers: {GET, POST},
+  handlers: { GET, POST },
   auth,
   signIn,
-  signOut,
+  signOut
 } = NextAuth({
-  session: {strategy: "jwt"},
-  cookies: {
-    sessionToken: {
-      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-      },
-    },
-  },
+  session: { strategy: 'jwt' },
   pages: {
-    signIn: "/auth/login",
-    error: "/auth/error",
-    signOut: "/auth/login"
+    signIn: '/auth/login',
+    error: '/auth/error',
+    signOut: '/auth/login'
   },
   events: {
     async linkAccount({ user }) {
       await db.user.update({
         where: { id: user.id },
         data: { emailVerified: new Date() }
-      })
-    },
-    async signOut() {
-      // Clear any server-side session data if needed
-      console.log("User signed out");
+      });
     }
   },
   callbacks: {
     async signIn({ user, account }) {
       // Allow OAuth without email verification
-      if (account?.provider !== "credentials") return true;
+      if (account?.provider !== 'credentials') return true;
 
-      let existingUser = undefined
+      let existingUser = undefined;
       if (user.id) {
         existingUser = await getUserById(user.id);
       }
@@ -70,13 +54,13 @@ export const {
       return true;
     },
     // TODO: fix token typescript properly
-    async session({ session, token }: {session: Session, token?: any}) {
+    async session({ session, token }: { session: Session; token?: any }) {
       if (token.sub && session.user) {
-        session.user.id = token.sub
+        session.user.id = token.sub;
       }
 
       if (token.role && session.user) {
-        session.user.role = token.role
+        session.user.role = token.role;
       }
 
       if (session.user) {
@@ -84,27 +68,24 @@ export const {
         session.user.name = token.name;
         session.user.email = token.email;
         session.user.isOAuth = token.isOAuth;
-
       }
 
-      return session
+      return session;
     },
-    async jwt({token}){
-      if (!token.sub) return token
-      const existingUser = await getUserById(token.sub)
-      if (!existingUser) return token
-      
-      const existingAccount = await getAccountByUserId(
-        existingUser.id
-      );
+    async jwt({ token }) {
+      if (!token.sub) return token;
+      const existingUser = await getUserById(token.sub);
+      if (!existingUser) return token;
+
+      const existingAccount = await getAccountByUserId(existingUser.id);
 
       token.isOAuth = !!existingAccount;
-      token.name = existingUser.name
-      token.role = existingUser.role
+      token.name = existingUser.name;
+      token.role = existingUser.role;
       token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
-      return token
+      return token;
     }
   },
   adapter: PrismaAdapter(db),
   ...authConfig
-})
+});

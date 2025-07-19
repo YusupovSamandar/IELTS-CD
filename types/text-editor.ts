@@ -46,10 +46,12 @@ export type BulletedListElement = {
 };
 export type HeadingOneElement = {
   type: 'heading-one';
+  align?: TextAlignType;
   children: CustomText[];
 };
 export type HeadingTwoElement = {
   type: 'heading-two';
+  align?: TextAlignType;
   children: CustomText[];
 };
 export type ListItemElement = {

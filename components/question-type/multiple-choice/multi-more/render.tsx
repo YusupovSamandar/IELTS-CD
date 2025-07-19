@@ -1,6 +1,7 @@
 'use client';
 
 import { useContext, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { ExamContext } from '@/global/exam-context';
 import { useExamHandler } from '@/global/use-exam-handler';
 import { MultiMoreExtended } from '@/types/test-exam';
@@ -32,9 +33,19 @@ export const MultiMoreRender = ({
   }
 
   const handleCheck = (checked: boolean, choiceId: string) => {
-    const updatedChoiceIdList = checked
-      ? [...choiceIdList, choiceId]
-      : choiceIdList.filter((id) => id !== choiceId);
+    let updatedChoiceIdList: string[];
+
+    if (checked) {
+      // Only allow maximum 2 selections
+      if (choiceIdList.length >= 2) {
+        toast.error('You can only select maximum 2 answers');
+        return;
+      }
+      updatedChoiceIdList = [...choiceIdList, choiceId];
+    } else {
+      updatedChoiceIdList = choiceIdList.filter((id) => id !== choiceId);
+    }
+
     setChoiceIdList(updatedChoiceIdList);
     handleAnswerSelected({
       questionNumber: multiMore.question.questionNumber,
@@ -61,6 +72,9 @@ export const MultiMoreRender = ({
           {multiMore.question.questionNumber}
         </p>
         <p>{multiMore.title}</p>
+        <p className="text-sm text-muted-foreground">
+          Select exactly 2 answers ({choiceIdList.length}/2 selected)
+        </p>
         <ActionButton
           actionType="update"
           editType="editMultiMore"

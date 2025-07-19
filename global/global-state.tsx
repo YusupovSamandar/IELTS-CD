@@ -1,10 +1,8 @@
 'use client';
 
 import { FC, RefObject, createRef, useEffect, useState } from 'react';
-import { MatchingChoice } from '@prisma/client';
 import { AssessmentExtended, PartExtended } from '@/types/test-exam';
 import { ModeType } from '@/lib/validations/params';
-import { DndContext } from './dnd-context';
 import { EditContext, EditData, EditType } from './edit-context';
 import { AnswerType, ExamContext } from './exam-context';
 import { UserProvider } from './user-context';
@@ -33,11 +31,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   const [questionGroupId, setQuestionGroupId] = useState<string>('');
   const [prevContent, setPrevContent] = useState('');
-  const [matchingChoiceId, setMatchingChoiceId] = useState('');
   const [mode, setMode] = useState<ModeType | null>(null);
-  const [matchingChoiceList, setMatchingChoiceList] = useState<
-    MatchingChoice[]
-  >([]);
   const [choiceGroupOver, setChoiceGroupOver] = useState(false);
   const [questionId, setQuestionId] = useState<string | null>(null);
   const [isSubmit, setIsSubmit] = useState(false);
@@ -160,26 +154,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
             data
           }}
         >
-          <DndContext.Provider
-            value={{
-              questionGroupId,
-              matchingChoiceId,
-              matchingChoiceList,
-              prevContent,
-              choiceGroupOver,
-              questionId,
-              type: dndType,
-              setType: setDndType,
-              setQuestionId,
-              setChoiceGroupOver,
-              setPrevContent,
-              setMatchingChoiceList,
-              setMatchingChoiceId,
-              setQuestionGroupId
-            }}
-          >
-            {children}
-          </DndContext.Provider>
+          {children}
         </EditContext.Provider>
       </ExamContext.Provider>
     </UserProvider>

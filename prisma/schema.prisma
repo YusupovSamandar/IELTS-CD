@@ -68,7 +68,6 @@ model QuestionGroup {
   partId              String
   completion          Completion?
   identifyInfoList    IdentifyingInformation[]
-  matching            Matching?
   multiMoreList       MultipleChoiceMoreAnswers[]
   multiOneList        MultipleChoiceOneAnswer[]
   questions           Question[]
@@ -87,7 +86,6 @@ model Question {
   assessmentId    String
   completionId    String?
   identifyInfo    IdentifyingInformation?
-  matchingChoice  MatchingChoice?
   multiMore       MultipleChoiceMoreAnswers?
   multiOne        MultipleChoiceOneAnswer?
   assessment      Assessment                 @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
@@ -156,28 +154,6 @@ model Completion {
   questionGroupId String        @unique
   questionGroup   QuestionGroup @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
   questions       Question[]
-}
-
-model Matching {
-  id                 String           @id @default(cuid())
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @default(now()) @updatedAt
-  paragraph          String
-  titleForQuestion   String?
-  questionGroupId    String           @unique
-  questionGroup      QuestionGroup    @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
-  matchingChoiceList MatchingChoice[]
-}
-
-model MatchingChoice {
-  id         String    @id @default(cuid())
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @default(now()) @updatedAt
-  content    String
-  questionId String?   @unique
-  matchingId String
-  matching   Matching  @relation(fields: [matchingId], references: [id], onDelete: Cascade)
-  question   Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
 }
 
 model PassageHeading {
@@ -318,8 +294,6 @@ enum QuestionType {
   IDENTIFYING_INFORMATION
   COMPLETION
   TABLE_COMPLETION
-  MATCHING
-  MATCHING_HEADING
 }
 
 enum IdentifyChoice {

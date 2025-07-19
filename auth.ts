@@ -26,9 +26,21 @@ export const {
   signOut,
 } = NextAuth({
   session: {strategy: "jwt"},
+  cookies: {
+    sessionToken: {
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   pages: {
     signIn: "/auth/login",
-    error: "/auth/error"
+    error: "/auth/error",
+    signOut: "/auth/login"
   },
   events: {
     async linkAccount({ user }) {
@@ -36,6 +48,10 @@ export const {
         where: { id: user.id },
         data: { emailVerified: new Date() }
       })
+    },
+    async signOut() {
+      // Clear any server-side session data if needed
+      console.log("User signed out");
     }
   },
   callbacks: {

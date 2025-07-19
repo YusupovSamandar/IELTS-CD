@@ -4,8 +4,6 @@ import {
   Completion,
   EssayPart,
   IdentifyingInformation,
-  Matching,
-  MatchingChoice,
   MultipleChoiceMoreAnswers,
   MultipleChoiceOneAnswer,
   Part,
@@ -38,7 +36,6 @@ export type QuestionGroupExtended = QuestionGroup & {
   multiMoreList: MultiMoreExtended[];
   identifyInfoList: IdentifyInfoExtended[];
   completion?: CompletionExtended | null;
-  matching?: MatchingExtended | null;
 };
 export type MultiOneExtended = MultipleChoiceOneAnswer & {
   choices: Choice[];
@@ -53,11 +50,4 @@ export type IdentifyInfoExtended = IdentifyingInformation & {
 };
 export type CompletionExtended = Completion & {
   questions: Question[];
-};
-
-export type MatchingExtended = Matching & {
-  matchingChoiceList: MatchingChoiceExtended[];
-};
-export type MatchingChoiceExtended = MatchingChoice & {
-  question?: Question | null;
 };

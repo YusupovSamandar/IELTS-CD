@@ -23,25 +23,7 @@ export type AnswerType =
       questionNumber: number;
       type: 'COMPLETION';
       content: string;
-    }
-  | {
-      questionNumber: number;
-      type: 'MATCHING';
-      content: string;
-      matchingChoiceId: string;
     };
-
-// | {
-//     questionId: string
-//     type: 'NOTE_COMPLETION'
-//     content: string
-//   }
-// | {
-//     questionId: string
-//     type: 'MATCHING'
-//     content: string
-//     matchingChoiceId: string
-//   }
 
 interface ExamContextProps {
   activeTab: string;

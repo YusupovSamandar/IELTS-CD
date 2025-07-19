@@ -28,13 +28,15 @@ function FooterContentRender() {
           <Button
             key={part.id}
             className={cn(
-              'flex-1 rounded-none border-none h-12',
-              activeTab === part.id ? 'bg-primary text-primary-foreground' : ''
+              'flex-1 rounded-none border-none h-12 transition-all',
+              activeTab === part.id 
+                ? 'bg-primary text-primary-foreground shadow-md border-b-2 border-primary' 
+                : 'hover:bg-muted hover:text-foreground'
             )}
             variant={activeTab === part.id ? 'default' : 'outline'}
             onClick={() => setActiveTab(part.id)}
           >
-            {part.title}
+            <span className="font-medium">{part.title}</span>
           </Button>
         ))}
         <Button
@@ -64,7 +66,9 @@ function FooterContentRender() {
               key={part.id}
               className="flex items-center justify-center gap-8 w-full"
             >
-              <p className="px-1 whitespace-nowrap">{part.title}</p>
+              <div className="px-3 py-2 bg-primary text-primary-foreground rounded-md font-medium">
+                {part.title}
+              </div>
               <div className="flex items-center">
                 {part.questions.map((question) => (
                   <div
@@ -89,11 +93,14 @@ function FooterContentRender() {
             </div>
           ) : (
             <Button
-              className="w-full rounded-none border-none"
+              className={cn(
+                'w-full rounded-none border-none transition-colors',
+                'hover:bg-muted hover:text-foreground'
+              )}
               variant="outline"
               onClick={() => setActiveTab(part.id)}
             >
-              {part.title}
+              <span className="text-sm font-medium">{part.title}</span>
             </Button>
           )}
         </Fragment>

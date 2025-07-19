@@ -31,18 +31,6 @@ export const IdentifyInfoSchema = z.object({
   ])
 });
 
-export const MatchingHeadingSchema = z.object({
-  title: z.string().min(1, {
-    message: 'Title Multiple Choice is required'
-  }),
-  headingItems: z.array(z.string().min(1))
-});
-
-export const MatchingChoiceListSchema = z.object({
-  titleForQuestion: z.string().optional(),
-  matchingChoiceList: z.array(z.string().min(1))
-});
-
 export const CompletionAnswerSchema = z.object({
   questions: z.array(
     z.object({

@@ -7,16 +7,21 @@ import { Button } from '../ui/button';
 import { Icons } from '../ui/icons';
 import PublicAssessmentButton from './public-assessment-button';
 import TimeRemainingRender from './time-remaining-render';
+import BackHomeButton from './back-home-button';
 
 const TextExamHeaderRender = () => {
   const { mode } = useContext(ExamContext);
   return (
     <div className="px-4 py-2 flex items-center ">
-      {mode === 'edit' && <PublicAssessmentButton />}
+      {mode === 'edit' && (
+        <div className="flex items-center gap-2">
+          <BackHomeButton />
+          <PublicAssessmentButton />
+        </div>
+      )}
       <div className="gap-6 flex items-center">
         <Icons.logo className="h-6 w-6" aria-hidden="true" />
         <div className="">
-          <p className=" font-bold">Title</p>
           <TimeRemainingRender />
         </div>
       </div>

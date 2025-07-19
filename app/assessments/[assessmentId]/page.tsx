@@ -74,20 +74,6 @@ const AssessmentIdPage = async ({
                   questionNumber: 'asc'
                 }
               },
-              matching: {
-                include: {
-                  matchingChoiceList: {
-                    orderBy: {
-                      question: {
-                        questionNumber: 'asc'
-                      }
-                    },
-                    include: {
-                      question: true
-                    }
-                  }
-                }
-              },
               completion: {
                 include: {
                   questions: {

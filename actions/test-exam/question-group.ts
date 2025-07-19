@@ -9,7 +9,6 @@ import {
 } from '@/lib/validations/question-group';
 import { createCompletion } from '../question-type/completion';
 import { createIdentifyInfoList } from '../question-type/identify-info';
-import { createMatching } from '../question-type/matching';
 import { createMultiMoreList } from '../question-type/multiple-choice/multi-more';
 import { createMultiOneList } from '../question-type/multiple-choice/multi-one';
 import { createTableCompletion } from '../question-type/table-completion';
@@ -86,11 +85,6 @@ export const createQuestionGroup = async ({
         numberRows: formData.numberRows
       });
       break;
-    case 'MATCHING':
-      await createMatching(questionGroup, part.assessmentId);
-      break;
-    default:
-      throw new Error(`Unsupported question group type: ${formData.type}`);
   }
   revalidatePath(`/assessments/${part.assessmentId}`);
 };

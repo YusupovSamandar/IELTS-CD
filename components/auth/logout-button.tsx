@@ -1,7 +1,6 @@
 "use client";
 
-import { logout } from "@/actions/auth/logout";
-
+import { logout } from "@/lib/auth-utils";
 
 interface LogoutButtonProps {
   children?: React.ReactNode;
@@ -11,7 +10,7 @@ export const LogoutButton = ({
   children
 }: LogoutButtonProps) => {
   const onClick = async () => {
-    await logout();
+    await logout("/auth/login");
   };
 
   return (

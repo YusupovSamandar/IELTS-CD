@@ -29,7 +29,8 @@ export const QuestionGroupSchema = z
       QuestionType.MULTIPLE_CHOICE_MORE_ANSWERS,
       QuestionType.IDENTIFYING_INFORMATION,
       QuestionType.COMPLETION,
-      QuestionType.TABLE_COMPLETION
+      QuestionType.TABLE_COMPLETION,
+      QuestionType.LETTER_ANSWER
     ]),
     numberColumns: z.coerce.number().optional(),
     numberRows: z.coerce.number().optional(),

@@ -98,6 +98,16 @@ const AssessmentIdPage = async ({
                   }
                 }
               },
+              letterAnswers: {
+                include: {
+                  question: true
+                },
+                orderBy: {
+                  question: {
+                    questionNumber: 'asc'
+                  }
+                }
+              },
               multiOneList: {
                 include: {
                   choices: {

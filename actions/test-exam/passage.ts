@@ -128,3 +128,77 @@ export const updatePassage = async ({
   });
   revalidatePath(`/assessments/${passage.part.assessmentId}`);
 };
+
+export const deletePassage = async (passageId: string) => {
+  const passage = await db.passage.findUnique({
+    where: { id: passageId },
+    select: { part: { select: { assessmentId: true } } }
+  });
+
+  if (!passage) {
+    throw new Error('Passage not found');
+  }
+
+  await db.passage.delete({
+    where: { id: passageId }
+  });
+
+  revalidatePath(`/assessments/${passage.part.assessmentId}`);
+};
+
+export const createPassageHeading = async (passageId: string) => {
+  const passage = await db.passage.findUnique({
+    where: { id: passageId },
+    select: {
+      part: { select: { assessmentId: true } },
+      passageHeadingList: {
+        select: { order: true },
+        orderBy: { order: 'desc' },
+        take: 1
+      }
+    }
+  });
+
+  if (!passage) {
+    throw new Error('Passage not found');
+  }
+
+  // Get the next order number
+  const nextOrder =
+    passage.passageHeadingList.length > 0
+      ? passage.passageHeadingList[0].order + 1
+      : 0;
+
+  // Calculate the letter for the heading (A, B, C, etc.)
+  const headingLetter = String.fromCharCode(65 + nextOrder); // A=65, B=66, etc.
+
+  await db.passageHeading.create({
+    data: {
+      title: `Paragraph ${headingLetter}`,
+      content: 'Enter your paragraph content here...',
+      order: nextOrder,
+      passageId
+    }
+  });
+
+  revalidatePath(`/assessments/${passage.part.assessmentId}`);
+};
+
+export const deletePassageHeading = async (headingId: string) => {
+  const heading = await db.passageHeading.findUnique({
+    where: { id: headingId },
+    select: {
+      passage: { select: { part: { select: { assessmentId: true } } } }
+    }
+  });
+
+  if (!heading) {
+    throw new Error('Passage heading not found');
+  }
+
+  await db.passageHeading.delete({
+    where: { id: headingId }
+  });
+
+  revalidatePath(`/assessments/${heading.passage.part.assessmentId}`);
+};

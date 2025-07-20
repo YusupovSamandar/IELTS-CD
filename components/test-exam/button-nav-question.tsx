@@ -11,22 +11,22 @@ function ButtonNavigationQuestion() {
   } = useExamHandler();
 
   return (
-    <div className="fixed bottom-20 right-4 h-20 z-50 flex gap-2">
+    <div className="fixed top-2 right-2 z-50 flex gap-1">
       <Button
         onClick={() => handlePrevQuestion()}
         disabled={!isHasPrevQuestion}
-        size="xl"
+        size="lg"
         className="shadow-lg"
       >
-        <ArrowLeft />
+        <ArrowLeft className="h-5 w-5" />
       </Button>
       <Button
         onClick={() => handleNextQuestion()}
         disabled={!isHasNextQuestion}
-        size="xl"
+        size="lg"
         className="shadow-lg"
       >
-        <ArrowRight />
+        <ArrowRight className="h-5 w-5" />
       </Button>
     </div>
   );

@@ -35,6 +35,7 @@ export type QuestionGroupExtended = QuestionGroup & {
   multiOneList: MultiOneExtended[];
   multiMoreList: MultiMoreExtended[];
   identifyInfoList: IdentifyInfoExtended[];
+  letterAnswers: LetterAnswerExtended[];
   completion?: CompletionExtended | null;
 };
 export type MultiOneExtended = MultipleChoiceOneAnswer & {
@@ -46,6 +47,17 @@ export type MultiMoreExtended = MultipleChoiceMoreAnswers & {
   question: Question;
 };
 export type IdentifyInfoExtended = IdentifyingInformation & {
+  question: Question;
+};
+export type LetterAnswerExtended = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  title: string;
+  paragraph?: string | null;
+  correctLetter: string;
+  questionId: string;
+  questionGroupId: string;
   question: Question;
 };
 export type CompletionExtended = Completion & {

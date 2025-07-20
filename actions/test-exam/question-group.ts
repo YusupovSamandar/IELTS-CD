@@ -9,6 +9,7 @@ import {
 } from '@/lib/validations/question-group';
 import { createCompletion } from '../question-type/completion';
 import { createIdentifyInfoList } from '../question-type/identify-info';
+import { createLetterAnswerList } from '../question-type/letter-answer';
 import { createMultiMoreList } from '../question-type/multiple-choice/multi-more';
 import { createMultiOneList } from '../question-type/multiple-choice/multi-one';
 import { createTableCompletion } from '../question-type/table-completion';
@@ -74,6 +75,9 @@ export const createQuestionGroup = async ({
       break;
     case 'COMPLETION':
       await createCompletion(questionGroup, part.assessmentId);
+      break;
+    case 'LETTER_ANSWER':
+      await createLetterAnswerList(questionGroup, part.assessmentId);
       break;
     case 'TABLE_COMPLETION':
       await createTableCompletion({

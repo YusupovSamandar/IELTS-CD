@@ -68,6 +68,7 @@ model QuestionGroup {
   partId              String
   completion          Completion?
   identifyInfoList    IdentifyingInformation[]
+  letterAnswers       LetterAnswer[]
   multiMoreList       MultipleChoiceMoreAnswers[]
   multiOneList        MultipleChoiceOneAnswer[]
   questions           Question[]
@@ -86,6 +87,7 @@ model Question {
   assessmentId    String
   completionId    String?
   identifyInfo    IdentifyingInformation?
+  letterAnswer    LetterAnswer?
   multiMore       MultipleChoiceMoreAnswers?
   multiOne        MultipleChoiceOneAnswer?
   assessment      Assessment                 @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
@@ -154,6 +156,19 @@ model Completion {
   questionGroupId String        @unique
   questionGroup   QuestionGroup @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
   questions       Question[]
+}
+
+model LetterAnswer {
+  id              String        @id @default(cuid())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
+  title           String
+  paragraph       String?
+  correctLetter   String
+  questionId      String        @unique
+  questionGroupId String
+  questionGroup   QuestionGroup @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
+  question        Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
 }
 
 model PassageHeading {
@@ -294,6 +309,7 @@ enum QuestionType {
   IDENTIFYING_INFORMATION
   COMPLETION
   TABLE_COMPLETION
+  LETTER_ANSWER
 }
 
 enum IdentifyChoice {

@@ -22,10 +22,10 @@ const TestExamContentRender = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col min-h-0">
       {/* Audio Player Section - Show at assessment level for listening assessments */}
       {selectedAssessment.sectionType === 'LISTENING' && (
-        <div className="p-4 border-b bg-background">
+        <div className="p-4 border-b bg-background flex-shrink-0">
           <div className="container mx-auto max-w-4xl">
             <AudioPlayerSection
               assessment={{
@@ -37,17 +37,17 @@ const TestExamContentRender = () => {
         </div>
       )}
 
-      <Tabs value={activeTab} className="flex-1 flex flex-col">
-        <div className="flex-1 overflow-hidden">
+      <Tabs value={activeTab} className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 overflow-hidden min-h-0">
           {selectedAssessment.parts.map((part) => {
             return (
               <TabsContent
                 key={part.id}
                 value={part.id}
-                className="h-full flex flex-col"
+                className="h-full flex flex-col min-h-0"
                 style={{ display: part.id === activeTab ? 'flex' : 'none' }}
               >
-                <div className="p-4">
+                <div className="p-4 flex-shrink-0">
                   <div className="px-4 py-2 border-foreground rounded-md border items-center">
                     <div className="flex gap-2 justify-between items-center">
                       <div>
@@ -63,7 +63,7 @@ const TestExamContentRender = () => {
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto pb-20">
+                <div className="flex-1 min-h-0">
                   <PartBodyContentRender />
                 </div>
                 {(selectedAssessment.sectionType === 'READING' ||

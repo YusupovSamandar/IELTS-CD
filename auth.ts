@@ -24,6 +24,7 @@ export const {
   signIn,
   signOut
 } = NextAuth({
+  trustHost: true, // Add this line to trust all hosts (needed for Vercel deployment)
   session: { strategy: 'jwt' },
   pages: {
     signIn: '/auth/login',

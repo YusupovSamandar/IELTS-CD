@@ -1,7 +1,3 @@
-1. ✅ YES NO NOTGIVEN new question type - reading only. This works exactly the same as identify information but the only difference is that the option name is 'YES' 'NO' 'NOT GIVEN' instead of true false not given. other than that everything is the same. see if you can manipulate the code and achieve this without creating new question group type then do it. if you should create a question group then do it. whichever is more effective.
-2. ✅ Bottom part tabs: They are when selected, the background is blue showing the active tab, but if tab name is smth like Passage 1 then on laptop the word is showing vertically like this: 
-`
-passage
-1
-`
-and overflowing from the border. fix that
+1. Letter Answer question group is working incorrectly. If i insert A,B,C,D,E,F as options i also see G as an option too. WTF. find out why and fix it.
+2. Question group can also consist of 1 question only. currently if i create a question group from lets say 40 to 40 then i got an error saying that latter must be greater. 
+in this situation i want it to create 1 question number 40.

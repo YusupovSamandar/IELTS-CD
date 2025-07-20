@@ -35,7 +35,8 @@ export const YesNoNotGivenRender = ({
 
   useEffect(() => {
     const answer = userAnswers.find(
-      (answer) => answer.questionNumber === yesNoNotGiven.question.questionNumber
+      (answer) =>
+        answer.questionNumber === yesNoNotGiven.question.questionNumber
     );
     setAnswer(answer);
   }, [userAnswers, yesNoNotGiven.question]);
@@ -73,7 +74,9 @@ export const YesNoNotGivenRender = ({
             content: value
           })
         }
-        value={answer && answer.type === 'YES_NO_NOT_GIVEN' ? answer.content : ''}
+        value={
+          answer && answer.type === 'YES_NO_NOT_GIVEN' ? answer.content : ''
+        }
       >
         {[
           IdentifyChoice.TRUE,

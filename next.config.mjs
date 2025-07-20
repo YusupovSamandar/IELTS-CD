@@ -4,7 +4,7 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client']
   },
-  
+
   // Reduce JavaScript bundle size
   swcMinify: true
 };

@@ -24,7 +24,6 @@ const LetterAnswerSchema = z.object({
   letterAnswers: z.array(
     z.object({
       id: z.string(),
-      title: z.string().min(1, 'Title is required'),
       correctLetter: z
         .string()
         .min(1, 'Letter is required')
@@ -47,7 +46,7 @@ export function LetterAnswerUpdateForm() {
   const form = useForm<z.infer<typeof LetterAnswerSchema>>({
     resolver: zodResolver(LetterAnswerSchema),
     defaultValues: {
-      letterAnswers: [{ id: '', title: '', correctLetter: '' }]
+      letterAnswers: [{ id: '', correctLetter: '' }]
     }
   });
 
@@ -57,7 +56,6 @@ export function LetterAnswerUpdateForm() {
         'letterAnswers',
         letterAnswers.map((letterAnswer) => ({
           id: letterAnswer.id,
-          title: letterAnswer.title,
           correctLetter: letterAnswer.correctLetter
         }))
       );
@@ -103,23 +101,6 @@ export function LetterAnswerUpdateForm() {
                   </h3>
 
                   <div className="space-y-3">
-                    <FormField
-                      control={form.control}
-                      name={`letterAnswers.${index}.title`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Question Title</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Enter question title..."
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
                     <FormField
                       control={form.control}
                       name={`letterAnswers.${index}.correctLetter`}

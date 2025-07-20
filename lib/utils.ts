@@ -32,7 +32,9 @@ export const countBlankOccurrences = ({
   startQuesNum: number;
 }) => {
   let blankCount = 0;
+  const updates: Array<{ path: any; newNode: any }> = [];
 
+  // First pass: collect all blank nodes and their updates
   for (const [node, path] of Editor.nodes(editor, {
     at: []
   })) {
@@ -44,10 +46,21 @@ export const countBlankOccurrences = ({
         type,
         questionNumber: startQuesNum + blankCount
       };
+
+      updates.push({ path: [...path], newNode });
       blankCount++;
-      Transforms.setNodes(editor, { ...newNode }, { at: path });
     }
   }
+
+  // Second pass: apply updates in reverse order to maintain paths
+  updates.reverse().forEach(({ path, newNode }) => {
+    try {
+      Transforms.setNodes(editor, { ...newNode }, { at: path });
+    } catch (error) {
+      console.warn('Error updating blank node:', error);
+    }
+  });
+
   return blankCount;
 };
 // export const formatTime = (time: number) => {

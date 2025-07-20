@@ -1,5 +1,6 @@
 import { RenderElementProps } from 'slate-react';
 import CompletionBlankRender from '@/components/question-type/completion/blank-render';
+import LetterAnswerBlankRender from '@/components/question-type/letter-answer/blank-render';
 import ResultBlankRender from '@/components/score/review-and-explain/completion-render/blank';
 
 type ReadonlyElementRenderProps =
@@ -13,6 +14,17 @@ type ReadonlyElementRenderProps =
       type: 'Completion';
       mode: 'result';
       assessmentId: string;
+    }
+  | {
+      slateProps: RenderElementProps;
+      type: 'LetterAnswer';
+      mode: 'edit' | 'readonly';
+    }
+  | {
+      slateProps: RenderElementProps;
+      type: 'LetterAnswer';
+      mode: 'result';
+      assessmentId: string;
     };
 export const ElementRender = (props: ReadonlyElementRenderProps) => {
   const { slateProps } = props;
@@ -21,6 +33,14 @@ export const ElementRender = (props: ReadonlyElementRenderProps) => {
     case 'blank':
       if (props.mode === 'result') {
         if (props.type === 'Completion') {
+          return (
+            <ResultBlankRender
+              questionNumber={element.questionNumber}
+              assessmentId={props.assessmentId}
+            />
+          );
+        }
+        if (props.type === 'LetterAnswer') {
           return (
             <ResultBlankRender
               questionNumber={element.questionNumber}
@@ -40,6 +60,11 @@ export const ElementRender = (props: ReadonlyElementRenderProps) => {
         if (props.type === 'Completion') {
           return (
             <CompletionBlankRender questionNumber={element.questionNumber} />
+          );
+        }
+        if (props.type === 'LetterAnswer') {
+          return (
+            <LetterAnswerBlankRender questionNumber={element.questionNumber} />
           );
         }
       }

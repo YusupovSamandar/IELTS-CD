@@ -29,7 +29,7 @@ const LetterAnswerParagraphUpdateForm = () => {
   const router = useRouter();
   const renderElement = useCallback(
     (props: RenderElementProps) => (
-      <ElementRender slateProps={props} type="Completion" mode="edit" />
+      <ElementRender slateProps={props} type="LetterAnswer" mode="edit" />
     ),
     []
   );
@@ -41,7 +41,6 @@ const LetterAnswerParagraphUpdateForm = () => {
   const [isPending, startTransition] = useTransition();
   const isModalOpen = isOpen && type === 'editLetterAnswerParagraph';
   const questionGroup = data?.questionGroup;
-  // Get the first letter answer, create default paragraph if none exists
   const firstLetterAnswer = questionGroup?.letterAnswers?.[0];
   const editor = useMemo(
     () => withInline(withHistory(withReact(createEditor()))),
@@ -52,35 +51,30 @@ const LetterAnswerParagraphUpdateForm = () => {
     return null;
   }
 
-  const handleSubmit = () => {
-    const blanksCount = countBlankOccurrences({
+  const handleSave = async () => {
+    const blankCount = countBlankOccurrences({
       editor,
       startQuesNum: questionGroup.startQuestionNumber
     });
-
-    if (blanksCount === 0) {
-      toast.error('Please add at least one blank to the paragraph.');
-      return;
-    }
-
-    if (blanksCount !== questionGroup.letterAnswers?.length) {
+    const totalQuestions = questionGroup.letterAnswers?.length || 0;
+    if (blankCount !== totalQuestions) {
       toast.error(
-        `Number of blanks (${blanksCount}) must match number of letter answers (${questionGroup.letterAnswers?.length}).`
+        `Total Blank must be equal to number of letter answers
+        Total Blank: ${blankCount}, Total Letter Answers: ${totalQuestions} `
       );
       return;
     }
-
     startTransition(async () => {
       try {
         await updateLetterAnswerParagraph({
           letterAnswerId: firstLetterAnswer.id,
           paragraph: JSON.stringify(editor.children)
         });
-        onClose();
-        toast.success('Letter answer paragraph updated successfully');
+        toast.success('Updated');
         router.refresh();
-      } catch (error) {
-        catchError(error);
+        onClose();
+      } catch (err) {
+        catchError(err);
       }
     });
   };
@@ -91,39 +85,26 @@ const LetterAnswerParagraphUpdateForm = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContentWithScrollArea className="gap-0 max-w-4xl">
-        <div className="px-6 pt-6">
-          <h2 className="text-xl font-bold mb-4">
-            Update Letter Answer Paragraph
-          </h2>
-          <p className="text-sm text-muted-foreground mb-6">
-            Add blanks where users should enter letters. Number of blanks must
-            match number of letter answers (
-            {questionGroup.letterAnswers?.length}).
-          </p>
-        </div>
+      <DialogContentWithScrollArea className="max-w-7xl">
+        <Slate
+          key={firstLetterAnswer.paragraph}
+          editor={editor}
+          initialValue={defaultValue}
+        >
+          <Toolbar />
 
-        <div className="px-6 pb-6">
-          <Slate editor={editor} initialValue={defaultValue}>
-            <Toolbar />
-            <div className="border rounded-md p-4 min-h-[200px]">
-              <Editable
-                renderElement={renderElement}
-                renderLeaf={renderLeaf}
-                placeholder="Enter your paragraph here. Use the toolbar to add blanks where users should enter letters."
-              />
-            </div>
-          </Slate>
-        </div>
-
-        <div className="px-6 pb-6 flex justify-end gap-4">
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <Button onClick={handleSubmit} disabled={isPending}>
-            {isPending ? 'Updating...' : 'Update Paragraph'}
+          <Editable
+            renderElement={renderElement}
+            renderLeaf={renderLeaf}
+            placeholder="Enter your paragraph here. Use the toolbar to add blanks where users should enter letters."
+            spellCheck
+            autoFocus
+          />
+          <Button disabled={isPending} onClick={handleSave}>
+            Save
           </Button>
-        </div>
+        </Slate>
+        <DialogClose onClick={onClose} />
       </DialogContentWithScrollArea>
     </Dialog>
   );

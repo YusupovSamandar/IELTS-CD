@@ -132,15 +132,9 @@ const PartBodyContentRender = () => {
   // Otherwise render the normal reading interface with resizable panels
   return (
     <div className="h-full min-h-0 flex flex-col">
-      <ResizablePanelGroup
-        direction="horizontal"
-        className="flex-1 min-h-0"
-      >
+      <ResizablePanelGroup direction="horizontal" className="flex-1 min-h-0">
         <ResizablePanel defaultSize={50} className="min-h-0">
-          <ScrollArea
-            type="always"
-            className="w-full h-full pl-4 pr-8"
-          >
+          <ScrollArea type="always" className="w-full h-full pl-4 pr-8">
             <div className="pb-16">
               {selectedPart.passage ? (
                 <PassageRender passage={selectedPart.passage} />
@@ -160,10 +154,7 @@ const PartBodyContentRender = () => {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={50} className="min-h-0">
-          <ScrollArea
-            type="always"
-            className="w-full h-full pl-4 pr-8"
-          >
+          <ScrollArea type="always" className="w-full h-full pl-4 pr-8">
             <div className="pb-16">
               <div className="flex justify-end">
                 <ActionButton
@@ -177,67 +168,70 @@ const PartBodyContentRender = () => {
 
               {selectedPart.questionGroups &&
               selectedPart.questionGroups.length > 0 ? (
-              selectedPart.questionGroups.map((questionGroup) => {
-                return (
-                  <div key={questionGroup.id} className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-bold">
-                          Questions {questionGroup.startQuestionNumber}-
-                          {questionGroup.endQuestionNumber}
-                        </p>
-                        <p className=" whitespace-pre-line">
-                          {questionGroup.title}
-                        </p>
+                selectedPart.questionGroups.map((questionGroup) => {
+                  return (
+                    <div key={questionGroup.id} className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-bold">
+                            Questions {questionGroup.startQuestionNumber}-
+                            {questionGroup.endQuestionNumber}
+                          </p>
+                          <p className=" whitespace-pre-line">
+                            {questionGroup.title}
+                          </p>
+                        </div>
+                        <div>
+                          <ActionButton
+                            actionType="update"
+                            editType="editQuestionGroup"
+                            data={{ questionGroup }}
+                          />
+                          <ActionButton
+                            actionType="delete"
+                            editType="deleteQuestionGroup"
+                            data={{ questionGroup }}
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <ActionButton
-                          actionType="update"
-                          editType="editQuestionGroup"
-                          data={{ questionGroup }}
-                        />
-                        <ActionButton
-                          actionType="delete"
-                          editType="deleteQuestionGroup"
-                          data={{ questionGroup }}
-                        />
-                      </div>
-                    </div>
 
-                    {questionGroup.type === 'MULTIPLE_CHOICE_ONE_ANSWER' &&
-                      questionGroup.multiOneList.map((multiOne) => (
-                        <MultiOneRender multiOne={multiOne} key={multiOne.id} />
-                      ))}
-                    {questionGroup.type === 'MULTIPLE_CHOICE_MORE_ANSWERS' &&
-                      questionGroup.multiMoreList.map((multiMore) => (
-                        <MultiMoreRender
-                          multiMore={multiMore}
-                          key={multiMore.id}
-                        />
-                      ))}
-                    {questionGroup.type === 'IDENTIFYING_INFORMATION' &&
-                      questionGroup.identifyInfoList.map((identifyInfo) => (
-                        <IdentifyInfoRender
-                          identifyInfo={identifyInfo}
-                          key={identifyInfo.id}
-                        />
-                      ))}
-                    {(questionGroup.type === 'COMPLETION' ||
-                      questionGroup.type === 'TABLE_COMPLETION') && (
-                      <CompletionRender questionGroup={questionGroup} />
-                    )}
-                    {questionGroup.type === 'LETTER_ANSWER' && (
-                      <LetterAnswerRender questionGroup={questionGroup} />
-                    )}
-                  </div>
-                );
-              })
-            ) : (
-              <div className="p-4 text-center text-muted-foreground">
-                No question groups yet. Click &quot;New Question Group&quot; to
-                create one.
-              </div>
-            )}
+                      {questionGroup.type === 'MULTIPLE_CHOICE_ONE_ANSWER' &&
+                        questionGroup.multiOneList.map((multiOne) => (
+                          <MultiOneRender
+                            multiOne={multiOne}
+                            key={multiOne.id}
+                          />
+                        ))}
+                      {questionGroup.type === 'MULTIPLE_CHOICE_MORE_ANSWERS' &&
+                        questionGroup.multiMoreList.map((multiMore) => (
+                          <MultiMoreRender
+                            multiMore={multiMore}
+                            key={multiMore.id}
+                          />
+                        ))}
+                      {questionGroup.type === 'IDENTIFYING_INFORMATION' &&
+                        questionGroup.identifyInfoList.map((identifyInfo) => (
+                          <IdentifyInfoRender
+                            identifyInfo={identifyInfo}
+                            key={identifyInfo.id}
+                          />
+                        ))}
+                      {(questionGroup.type === 'COMPLETION' ||
+                        questionGroup.type === 'TABLE_COMPLETION') && (
+                        <CompletionRender questionGroup={questionGroup} />
+                      )}
+                      {questionGroup.type === 'LETTER_ANSWER' && (
+                        <LetterAnswerRender questionGroup={questionGroup} />
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="p-4 text-center text-muted-foreground">
+                  No question groups yet. Click &quot;New Question Group&quot;
+                  to create one.
+                </div>
+              )}
             </div>
             <ScrollBar className="w-4" />
           </ScrollArea>

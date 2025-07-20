@@ -21,7 +21,7 @@ const LetterAnswerParagraphRender = ({
 }) => {
   const renderElement = useCallback(
     (props: RenderElementProps) => (
-      <ElementRender slateProps={props} type="Completion" mode="readonly" />
+      <ElementRender slateProps={props} type="LetterAnswer" mode="readonly" />
     ),
     []
   );

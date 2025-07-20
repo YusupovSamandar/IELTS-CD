@@ -237,7 +237,6 @@ export const updateLetterAnswerAnswers = async ({
 }: {
   letterAnswers: Array<{
     id: string;
-    title: string;
     correctLetter: string;
   }>;
 }) => {
@@ -250,15 +249,12 @@ export const updateLetterAnswerAnswers = async ({
         .replace(/[^a-zA-Z]/g, '')
         .toUpperCase();
       if (letterOnly.length !== 1) {
-        throw new Error(
-          `Answer must be a single letter for ${letterAnswer.title}`
-        );
+        throw new Error(`Answer must be a single letter for question`);
       }
 
       return db.letterAnswer.update({
         where: { id: letterAnswer.id },
         data: {
-          title: letterAnswer.title,
           correctLetter: letterOnly
         }
       });

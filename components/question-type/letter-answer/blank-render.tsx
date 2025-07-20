@@ -24,49 +24,43 @@ function LetterAnswerBlankRender({
     (answer) => answer.questionNumber === questionNumber
   );
 
-  // Get all available letter options from the current assessment
+  // Get all available letter options from admin configuration
   const availableLetters = useMemo(() => {
     if (!selectedAssessment) {
-      // Provide default options A-H if no assessment
-      return ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+      return ['A', 'B', 'C', 'D']; // Minimal fallback
     }
 
-    const allLetters = new Set<string>();
+    const allOptions = new Set<string>();
 
-    // Collect all correct letters from all letter answer question groups
+    // Collect all letters from question groups (correct answers + admin-configured options)
     selectedAssessment.parts?.forEach((part) => {
       part.questionGroups?.forEach((qg) => {
+        // Add correct letters from letter answers
         qg.letterAnswers?.forEach((la) => {
           if (la.correctLetter) {
-            allLetters.add(la.correctLetter);
+            allOptions.add(la.correctLetter);
           }
         });
+
+        // Add admin-configured additional letter options
+        if (qg.additionalLetterOptions) {
+          qg.additionalLetterOptions.split(',').forEach((letter: string) => {
+            const trimmed = letter.trim().toUpperCase();
+            if (/^[A-Z]$/.test(trimmed)) {
+              allOptions.add(trimmed);
+            }
+          });
+        }
       });
     });
 
-    // If no letters found in the assessment, provide reasonable defaults
-    if (allLetters.size === 0) {
-      return ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+    // If no options are configured by admin, provide minimal fallback
+    if (allOptions.size === 0) {
+      return ['A', 'B', 'C', 'D'];
     }
 
-    // Ensure we have at least a reasonable range, fill gaps if needed
-    const sortedLetters = Array.from(allLetters).sort();
-    const firstLetter = sortedLetters[0];
-    const lastLetter = sortedLetters[sortedLetters.length - 1];
-
-    // Generate range from first to last letter found
-    const fullRange = [];
-    for (
-      let i = firstLetter.charCodeAt(0);
-      i <= lastLetter.charCodeAt(0);
-      i++
-    ) {
-      fullRange.push(String.fromCharCode(i));
-    }
-
-    return fullRange.length > 0
-      ? fullRange
-      : ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+    // Sort and return admin-configured options
+    return Array.from(allOptions).sort();
   }, [selectedAssessment]);
 
   return (

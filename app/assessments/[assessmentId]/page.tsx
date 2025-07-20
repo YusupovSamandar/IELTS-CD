@@ -69,6 +69,16 @@ const AssessmentIdPage = async ({
                   question: true
                 }
               },
+              yesNoNotGivenList: {
+                orderBy: {
+                  question: {
+                    questionNumber: 'asc'
+                  }
+                },
+                include: {
+                  question: true
+                }
+              },
               questions: {
                 orderBy: {
                   questionNumber: 'asc'

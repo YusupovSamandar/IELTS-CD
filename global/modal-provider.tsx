@@ -5,6 +5,7 @@ import OpenAssessmentModal from '@/components/open-assessment-modal';
 import { CompletionAnswerUpdateForm } from '@/components/question-type/completion/answer-update-form';
 import CompletionParagraphUpdateForm from '@/components/question-type/completion/paragraph-update-form';
 import { IdentifyInfoUpdateForm } from '@/components/question-type/identify-info/update-form';
+import { YesNoNotGivenUpdateForm } from '@/components/question-type/yes-no-not-given/update-form';
 import { LetterAnswerUpdateForm } from '@/components/question-type/letter-answer/answer-update-form';
 import LetterAnswerParagraphUpdateForm from '@/components/question-type/letter-answer/paragraph-update-form';
 import { ChoiceUpdateForm } from '@/components/question-type/multiple-choice/choice/update-form';
@@ -56,6 +57,7 @@ export function ModalProvider() {
       <ChoiceUpdateForm />
 
       <IdentifyInfoUpdateForm />
+      <YesNoNotGivenUpdateForm />
 
       <SubmitModal />
 

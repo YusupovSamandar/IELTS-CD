@@ -36,7 +36,7 @@ function FooterContentRender() {
             variant={activeTab === part.id ? 'default' : 'outline'}
             onClick={() => setActiveTab(part.id)}
           >
-            <span className="font-medium">{part.title}</span>
+            <span className="font-medium whitespace-nowrap">{part.title}</span>
           </Button>
         ))}
         <Button
@@ -66,7 +66,7 @@ function FooterContentRender() {
               key={part.id}
               className="flex items-center justify-center gap-8 w-full"
             >
-              <div className="px-3 py-2 bg-primary text-primary-foreground rounded-md font-medium">
+              <div className="px-3 py-2 bg-primary text-primary-foreground rounded-md font-medium whitespace-nowrap">
                 {part.title}
               </div>
               <div className="flex items-center">

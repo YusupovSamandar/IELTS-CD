@@ -5,7 +5,8 @@ import {
   MultiMoreExtended,
   MultiOneExtended,
   PartExtended,
-  QuestionGroupExtended
+  QuestionGroupExtended,
+  YesNoNotGivenExtended
 } from '@/types/test-exam';
 
 export type EditType =
@@ -14,6 +15,7 @@ export type EditType =
   | 'editChoice'
   | 'editMultiOne'
   | 'editIdentifyInfo'
+  | 'editYesNoNotGiven'
   | 'editCompletionParagraph'
   | 'editCompletionAnswer'
   | 'editLetterAnswerParagraph'
@@ -53,6 +55,7 @@ export interface EditData {
   multiOne?: MultiOneExtended;
   multiMore?: MultiMoreExtended;
   identifyInfo?: IdentifyInfoExtended;
+  yesNoNotGiven?: YesNoNotGivenExtended;
   passage?: Passage;
   passageHeading?: PassageHeading;
   assessment?: Assessment;

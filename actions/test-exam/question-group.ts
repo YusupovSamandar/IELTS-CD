@@ -13,6 +13,7 @@ import { createLetterAnswerList } from '../question-type/letter-answer';
 import { createMultiMoreList } from '../question-type/multiple-choice/multi-more';
 import { createMultiOneList } from '../question-type/multiple-choice/multi-one';
 import { createTableCompletion } from '../question-type/table-completion';
+import { createYesNoNotGivenList } from '../question-type/yes-no-not-given';
 
 export const createQuestionGroup = async ({
   formData,
@@ -72,6 +73,9 @@ export const createQuestionGroup = async ({
       break;
     case 'IDENTIFYING_INFORMATION':
       await createIdentifyInfoList(questionGroup, part.assessmentId);
+      break;
+    case 'YES_NO_NOT_GIVEN':
+      await createYesNoNotGivenList(questionGroup, part.assessmentId);
       break;
     case 'COMPLETION':
       await createCompletion(questionGroup, part.assessmentId);

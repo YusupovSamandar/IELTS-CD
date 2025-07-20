@@ -57,22 +57,24 @@ model Part {
 }
 
 model QuestionGroup {
-  id                  String                      @id @default(cuid())
-  createdAt           DateTime                    @default(now())
-  updatedAt           DateTime                    @default(now()) @updatedAt
-  title               String
-  description         String?
-  startQuestionNumber Int
-  endQuestionNumber   Int
-  type                QuestionType
-  partId              String
-  completion          Completion?
-  identifyInfoList    IdentifyingInformation[]
-  letterAnswers       LetterAnswer[]
-  multiMoreList       MultipleChoiceMoreAnswers[]
-  multiOneList        MultipleChoiceOneAnswer[]
-  questions           Question[]
-  part                Part                        @relation(fields: [partId], references: [id], onDelete: Cascade)
+  id                      String                      @id @default(cuid())
+  createdAt               DateTime                    @default(now())
+  updatedAt               DateTime                    @default(now()) @updatedAt
+  title                   String
+  description             String?
+  startQuestionNumber     Int
+  endQuestionNumber       Int
+  type                    QuestionType
+  partId                  String
+  additionalLetterOptions String?
+  completion              Completion?
+  identifyInfoList        IdentifyingInformation[]
+  yesNoNotGivenList       YesNoNotGiven[]
+  letterAnswers           LetterAnswer[]
+  multiMoreList           MultipleChoiceMoreAnswers[]
+  multiOneList            MultipleChoiceOneAnswer[]
+  questions               Question[]
+  part                    Part                        @relation(fields: [partId], references: [id], onDelete: Cascade)
 }
 
 model Question {
@@ -87,6 +89,7 @@ model Question {
   assessmentId    String
   completionId    String?
   identifyInfo    IdentifyingInformation?
+  yesNoNotGiven   YesNoNotGiven?
   letterAnswer    LetterAnswer?
   multiMore       MultipleChoiceMoreAnswers?
   multiOne        MultipleChoiceOneAnswer?
@@ -137,6 +140,18 @@ model Choice {
 }
 
 model IdentifyingInformation {
+  id              String         @id @default(cuid())
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @default(now()) @updatedAt
+  title           String
+  choiceCorrect   IdentifyChoice
+  questionId      String         @unique
+  questionGroupId String
+  questionGroup   QuestionGroup  @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
+  question        Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model YesNoNotGiven {
   id              String         @id @default(cuid())
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @default(now()) @updatedAt
@@ -307,6 +322,7 @@ enum QuestionType {
   MULTIPLE_CHOICE_ONE_ANSWER
   MULTIPLE_CHOICE_MORE_ANSWERS
   IDENTIFYING_INFORMATION
+  YES_NO_NOT_GIVEN
   COMPLETION
   TABLE_COMPLETION
   LETTER_ANSWER

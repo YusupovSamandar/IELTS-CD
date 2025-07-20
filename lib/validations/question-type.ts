@@ -81,6 +81,15 @@ export const IdentifyInfoSchema = z.object({
   ])
 });
 
+export const YesNoNotGivenSchema = z.object({
+  title: z.string().min(1),
+  choiceCorrect: z.enum([
+    IdentifyChoice.TRUE,
+    IdentifyChoice.FALSE,
+    IdentifyChoice.NOT_GIVEN
+  ])
+});
+
 export const CompletionAnswerSchema = z.object({
   questions: z.array(
     z.object({

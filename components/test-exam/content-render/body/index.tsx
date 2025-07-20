@@ -8,6 +8,7 @@ import { IdentifyInfoRender } from '@/components/question-type/identify-info/ren
 import { LetterAnswerRender } from '@/components/question-type/letter-answer/render';
 import { MultiMoreRender } from '@/components/question-type/multiple-choice/multi-more/render';
 import { MultiOneRender } from '@/components/question-type/multiple-choice/multi-one/render';
+import { YesNoNotGivenRender } from '@/components/question-type/yes-no-not-given/render';
 import { ActionButton } from '@/components/test-exam/action-button';
 import { buttonVariants } from '@/components/ui/button';
 import {
@@ -50,79 +51,88 @@ const PartBodyContentRender = () => {
           type="always"
           className="w-full h-full overflow-auto pl-4 pr-8"
         >
-          <div className="flex justify-end mb-4">
-            <ActionButton
-              actionType="create"
-              editType="createQuestionGroup"
-              data={{ part: selectedPart }}
-            >
-              <div className={buttonVariants()}>New Question Group</div>
-            </ActionButton>
-          </div>
-
-          {selectedPart.questionGroups &&
-          selectedPart.questionGroups.length > 0 ? (
-            selectedPart.questionGroups.map((questionGroup) => {
-              return (
-                <div key={questionGroup.id} className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-bold">
-                        Questions {questionGroup.startQuestionNumber}-
-                        {questionGroup.endQuestionNumber}
-                      </p>
-                      <p className=" whitespace-pre-line">
-                        {questionGroup.title}
-                      </p>
-                    </div>
-                    <div>
-                      <ActionButton
-                        actionType="update"
-                        editType="editQuestionGroup"
-                        data={{ questionGroup }}
-                      />
-                      <ActionButton
-                        actionType="delete"
-                        editType="deleteQuestionGroup"
-                        data={{ questionGroup }}
-                      />
-                    </div>
-                  </div>
-
-                  {questionGroup.type === 'MULTIPLE_CHOICE_ONE_ANSWER' &&
-                    questionGroup.multiOneList.map((multiOne) => (
-                      <MultiOneRender multiOne={multiOne} key={multiOne.id} />
-                    ))}
-                  {questionGroup.type === 'MULTIPLE_CHOICE_MORE_ANSWERS' &&
-                    questionGroup.multiMoreList.map((multiMore) => (
-                      <MultiMoreRender
-                        multiMore={multiMore}
-                        key={multiMore.id}
-                      />
-                    ))}
-                  {questionGroup.type === 'IDENTIFYING_INFORMATION' &&
-                    questionGroup.identifyInfoList.map((identifyInfo) => (
-                      <IdentifyInfoRender
-                        identifyInfo={identifyInfo}
-                        key={identifyInfo.id}
-                      />
-                    ))}
-                  {(questionGroup.type === 'COMPLETION' ||
-                    questionGroup.type === 'TABLE_COMPLETION') && (
-                    <CompletionRender questionGroup={questionGroup} />
-                  )}
-                  {questionGroup.type === 'LETTER_ANSWER' && (
-                    <LetterAnswerRender questionGroup={questionGroup} />
-                  )}
-                </div>
-              );
-            })
-          ) : (
-            <div className="p-4 text-center text-muted-foreground">
-              No question groups yet. Click &quot;New Question Group&quot; to
-              create one.
+          <div className="pb-16">
+            <div className="flex justify-end mb-4">
+              <ActionButton
+                actionType="create"
+                editType="createQuestionGroup"
+                data={{ part: selectedPart }}
+              >
+                <div className={buttonVariants()}>New Question Group</div>
+              </ActionButton>
             </div>
-          )}
+
+            {selectedPart.questionGroups &&
+            selectedPart.questionGroups.length > 0 ? (
+              selectedPart.questionGroups.map((questionGroup) => {
+                return (
+                  <div key={questionGroup.id} className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-bold">
+                          Questions {questionGroup.startQuestionNumber}-
+                          {questionGroup.endQuestionNumber}
+                        </p>
+                        <p className=" whitespace-pre-line">
+                          {questionGroup.title}
+                        </p>
+                      </div>
+                      <div>
+                        <ActionButton
+                          actionType="update"
+                          editType="editQuestionGroup"
+                          data={{ questionGroup }}
+                        />
+                        <ActionButton
+                          actionType="delete"
+                          editType="deleteQuestionGroup"
+                          data={{ questionGroup }}
+                        />
+                      </div>
+                    </div>
+
+                    {questionGroup.type === 'MULTIPLE_CHOICE_ONE_ANSWER' &&
+                      questionGroup.multiOneList.map((multiOne) => (
+                        <MultiOneRender multiOne={multiOne} key={multiOne.id} />
+                      ))}
+                    {questionGroup.type === 'MULTIPLE_CHOICE_MORE_ANSWERS' &&
+                      questionGroup.multiMoreList.map((multiMore) => (
+                        <MultiMoreRender
+                          multiMore={multiMore}
+                          key={multiMore.id}
+                        />
+                      ))}
+                    {questionGroup.type === 'IDENTIFYING_INFORMATION' &&
+                      questionGroup.identifyInfoList.map((identifyInfo) => (
+                        <IdentifyInfoRender
+                          identifyInfo={identifyInfo}
+                          key={identifyInfo.id}
+                        />
+                      ))}
+                    {questionGroup.type === 'YES_NO_NOT_GIVEN' &&
+                      questionGroup.yesNoNotGivenList.map((yesNoNotGiven) => (
+                        <YesNoNotGivenRender
+                          yesNoNotGiven={yesNoNotGiven}
+                          key={yesNoNotGiven.id}
+                        />
+                      ))}
+                    {(questionGroup.type === 'COMPLETION' ||
+                      questionGroup.type === 'TABLE_COMPLETION') && (
+                      <CompletionRender questionGroup={questionGroup} />
+                    )}
+                    {questionGroup.type === 'LETTER_ANSWER' && (
+                      <LetterAnswerRender questionGroup={questionGroup} />
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              <div className="p-4 text-center text-muted-foreground">
+                No question groups yet. Click &quot;New Question Group&quot; to
+                create one.
+              </div>
+            )}
+          </div>
           <ScrollBar className="w-4" />
         </ScrollArea>
       </div>
@@ -214,6 +224,13 @@ const PartBodyContentRender = () => {
                           <IdentifyInfoRender
                             identifyInfo={identifyInfo}
                             key={identifyInfo.id}
+                          />
+                        ))}
+                      {questionGroup.type === 'YES_NO_NOT_GIVEN' &&
+                        questionGroup.yesNoNotGivenList.map((yesNoNotGiven) => (
+                          <YesNoNotGivenRender
+                            yesNoNotGiven={yesNoNotGiven}
+                            key={yesNoNotGiven.id}
                           />
                         ))}
                       {(questionGroup.type === 'COMPLETION' ||

@@ -48,7 +48,8 @@ export function CreateQuestionGroupForm() {
       title: '',
       startQuestionNumber: 1,
       endQuestionNumber: 4,
-      description: ''
+      description: '',
+      additionalLetterOptions: ''
     }
   });
 
@@ -193,6 +194,31 @@ export function CreateQuestionGroupForm() {
                     )}
                   />
                 </>
+              )}
+              {/* Additional form field for Letter Answer */}
+              {form.getValues().type === QuestionType.LETTER_ANSWER && (
+                <FormField
+                  control={form.control}
+                  name="additionalLetterOptions"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Letter Answer Options (Required)</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          disabled={isPending}
+                          placeholder="A,B,C,D,E,F,G,H,I,J,K,L"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      <p className="text-sm text-muted-foreground">
+                        Configure ALL letter options to show in dropdowns (e.g.,
+                        A,B,C,D,E,F,G,H,I,J). Only these letters will be
+                        available for selection.
+                      </p>
+                    </FormItem>
+                  )}
+                />
               )}
               <div className="flex">
                 <FormField

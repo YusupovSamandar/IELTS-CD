@@ -33,7 +33,8 @@ export function UpdateQuestionGroupForm() {
       // type: 'MULTIPLE_CHOICE',
       startQuestionNumber: 1,
       endQuestionNumber: 2,
-      description: ''
+      description: '',
+      additionalLetterOptions: ''
     }
   });
   const router = useRouter();
@@ -44,6 +45,10 @@ export function UpdateQuestionGroupForm() {
       form.setValue('type', questionGroup.type);
       form.setValue('startQuestionNumber', questionGroup.startQuestionNumber);
       form.setValue('endQuestionNumber', questionGroup.endQuestionNumber);
+      form.setValue(
+        'additionalLetterOptions',
+        questionGroup.additionalLetterOptions || ''
+      );
     }
   }, [form, questionGroup]);
   if (!isModalOpen && !questionGroup) {
@@ -117,6 +122,28 @@ export function UpdateQuestionGroupForm() {
                       />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="additionalLetterOptions"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Letter Answer Options (Required)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        disabled={isPending}
+                        placeholder="A,B,C,D,E,F,G,H,I,J,K,L"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                    <p className="text-sm text-muted-foreground">
+                      Configure ALL letter options to show in dropdowns (e.g.,
+                      A,B,C,D,E,F,G,H,I,J). Only these letters will be available
+                      for selection.
+                    </p>
                   </FormItem>
                 )}
               />

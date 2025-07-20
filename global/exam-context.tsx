@@ -21,6 +21,11 @@ export type AnswerType =
     }
   | {
       questionNumber: number;
+      type: 'YES_NO_NOT_GIVEN';
+      content: IdentifyChoice;
+    }
+  | {
+      questionNumber: number;
       type: 'COMPLETION';
       content: string;
     };

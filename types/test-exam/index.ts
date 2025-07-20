@@ -11,7 +11,8 @@ import {
   PassageHeading,
   Question,
   QuestionGroup,
-  QuestionType
+  QuestionType,
+  YesNoNotGiven
 } from '@prisma/client';
 
 export type AssessmentExtended = Assessment & {
@@ -35,8 +36,10 @@ export type QuestionGroupExtended = QuestionGroup & {
   multiOneList: MultiOneExtended[];
   multiMoreList: MultiMoreExtended[];
   identifyInfoList: IdentifyInfoExtended[];
+  yesNoNotGivenList: YesNoNotGivenExtended[];
   letterAnswers: LetterAnswerExtended[];
   completion?: CompletionExtended | null;
+  additionalLetterOptions?: string | null;
 };
 export type MultiOneExtended = MultipleChoiceOneAnswer & {
   choices: Choice[];
@@ -47,6 +50,9 @@ export type MultiMoreExtended = MultipleChoiceMoreAnswers & {
   question: Question;
 };
 export type IdentifyInfoExtended = IdentifyingInformation & {
+  question: Question;
+};
+export type YesNoNotGivenExtended = YesNoNotGiven & {
   question: Question;
 };
 export type LetterAnswerExtended = {

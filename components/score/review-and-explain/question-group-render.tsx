@@ -29,6 +29,11 @@ async function QuestionGroupRender({ partId }: { partId: string }) {
             )}
           </Suspense>
           <Suspense fallback={<></>}>
+            {questionGroup.type === 'YES_NO_NOT_GIVEN' && (
+              <IdentifyInfoListRender questionGroupId={questionGroup.id} />
+            )}
+          </Suspense>
+          <Suspense fallback={<></>}>
             {questionGroup.type === 'COMPLETION' && (
               <CompletionRender questionGroupId={questionGroup.id} />
             )}

@@ -1,11 +1,3 @@
-1. ✅ User should be able to scroll the reading window and the question window separately
-
 2. ✅ The editor should be able to delete the reading passage and create it from scratch
 
-3. User should be able to see the TIME all time (time should be floating window) no matter they scroll on the reading or on the question window
-
 4. ✅ It is better if there is a new question type where the user can only write a letter (automatically capital letter)
-
-5. ✅ For reading passages including many paragraphs with letters (A, B, C, D, E, F, G .... etc paragraphs) the options should be more than five. Editor should be able to add or remove an additional paragraph. 
-
-6. ✅ Right-Left arrows is better placed in the north-eastern corner of the screen.

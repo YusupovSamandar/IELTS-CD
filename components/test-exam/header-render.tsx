@@ -1,9 +1,7 @@
 'use client';
 
 import { useContext } from 'react';
-import { AlignJustify, Bell, Wifi } from 'lucide-react';
 import { ExamContext } from '@/global/exam-context';
-import { Button } from '../ui/button';
 import { Icons } from '../ui/icons';
 import BackHomeButton from './back-home-button';
 import PublicAssessmentButton from './public-assessment-button';
@@ -40,18 +38,8 @@ const TextExamHeaderRender = () => {
           <TimeRemainingRender />
         </div>
       </div>
-      <div className="flex flex-1 items-center justify-end m">
-        <nav className="flex items-center">
-          <div className="p-4">
-            <Wifi />
-          </div>
-          <Button variant="ghost">
-            <Bell />
-          </Button>
-          <Button variant="ghost">
-            <AlignJustify />
-          </Button>
-        </nav>
+      <div className="flex flex-1 items-center justify-end">
+        {/* Icons removed as requested */}
       </div>
     </div>
   );

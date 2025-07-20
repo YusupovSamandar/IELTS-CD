@@ -141,17 +141,19 @@ const PartBodyContentRender = () => {
             type="always"
             className="w-full h-full pl-4 pr-8"
           >
-            {selectedPart.passage ? (
-              <PassageRender passage={selectedPart.passage} />
-            ) : (
-              <ActionButton
-                actionType="create"
-                editType="createPassage"
-                data={{ part: selectedPart }}
-              >
-                <div className={buttonVariants()}>New Passage</div>
-              </ActionButton>
-            )}
+            <div className="pb-16">
+              {selectedPart.passage ? (
+                <PassageRender passage={selectedPart.passage} />
+              ) : (
+                <ActionButton
+                  actionType="create"
+                  editType="createPassage"
+                  data={{ part: selectedPart }}
+                >
+                  <div className={buttonVariants()}>New Passage</div>
+                </ActionButton>
+              )}
+            </div>
 
             <ScrollBar className="w-4" />
           </ScrollArea>
@@ -162,18 +164,19 @@ const PartBodyContentRender = () => {
             type="always"
             className="w-full h-full pl-4 pr-8"
           >
-            <div className="flex justify-end">
-              <ActionButton
-                actionType="create"
-                editType="createQuestionGroup"
-                data={{ part: selectedPart }}
-              >
-                <div className={buttonVariants()}>New Question Group</div>
-              </ActionButton>
-            </div>
+            <div className="pb-16">
+              <div className="flex justify-end">
+                <ActionButton
+                  actionType="create"
+                  editType="createQuestionGroup"
+                  data={{ part: selectedPart }}
+                >
+                  <div className={buttonVariants()}>New Question Group</div>
+                </ActionButton>
+              </div>
 
-            {selectedPart.questionGroups &&
-            selectedPart.questionGroups.length > 0 ? (
+              {selectedPart.questionGroups &&
+              selectedPart.questionGroups.length > 0 ? (
               selectedPart.questionGroups.map((questionGroup) => {
                 return (
                   <div key={questionGroup.id} className="flex flex-col gap-2">
@@ -235,6 +238,7 @@ const PartBodyContentRender = () => {
                 create one.
               </div>
             )}
+            </div>
             <ScrollBar className="w-4" />
           </ScrollArea>
         </ResizablePanel>

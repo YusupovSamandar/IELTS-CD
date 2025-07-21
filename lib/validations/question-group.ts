@@ -42,14 +42,14 @@ export const QuestionGroupSchema = z
   })
   .refine(
     (data) => {
-      if (data.endQuestionNumber <= data.startQuestionNumber) {
+      if (data.endQuestionNumber < data.startQuestionNumber) {
         return false;
       }
 
       return true;
     },
     {
-      message: 'End question must be larger than start question',
+      message: 'End question must be greater than or equal to start question',
       path: ['endQuestionNumber']
     }
   )

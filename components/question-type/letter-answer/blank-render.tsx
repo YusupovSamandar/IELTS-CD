@@ -27,41 +27,54 @@ function LetterAnswerBlankRender({
   // Get all available letter options from admin configuration
   const availableLetters = useMemo(() => {
     if (!selectedAssessment) {
-      return ['A', 'B', 'C', 'D']; // Minimal fallback
+      return []; // No assessment, no options
     }
 
-    const allOptions = new Set<string>();
+    // Find the specific question group for the current questionNumber
+    let currentQuestionGroup = null;
+    for (const part of selectedAssessment.parts || []) {
+      for (const qg of part.questionGroups || []) {
+        if (
+          questionNumber >= qg.startQuestionNumber &&
+          questionNumber <= qg.endQuestionNumber
+        ) {
+          currentQuestionGroup = qg;
+          break;
+        }
+      }
+      if (currentQuestionGroup) break;
+    }
 
-    // Collect all letters from question groups (correct answers + admin-configured options)
-    selectedAssessment.parts?.forEach((part) => {
-      part.questionGroups?.forEach((qg) => {
-        // Add correct letters from letter answers
-        qg.letterAnswers?.forEach((la) => {
-          if (la.correctLetter) {
-            allOptions.add(la.correctLetter);
-          }
-        });
+    // If a specific question group is found
+    if (currentQuestionGroup) {
+      // If the group has admin-configured options, use ONLY those.
+      if (currentQuestionGroup.additionalLetterOptions) {
+        const options = currentQuestionGroup.additionalLetterOptions
+          .split(',')
+          .map((letter) => letter.trim().toUpperCase())
+          .filter((letter) => /^[A-Z]$/.test(letter));
 
-        // Add admin-configured additional letter options
-        if (qg.additionalLetterOptions) {
-          qg.additionalLetterOptions.split(',').forEach((letter: string) => {
-            const trimmed = letter.trim().toUpperCase();
-            if (/^[A-Z]$/.test(trimmed)) {
-              allOptions.add(trimmed);
-            }
-          });
+        if (options.length > 0) {
+          return options.sort();
+        }
+      }
+
+      // If no admin options, fallback to collecting correct letters from THIS group only
+      const optionsFromCorrectAnswers = new Set<string>();
+      currentQuestionGroup.letterAnswers?.forEach((la) => {
+        if (la.correctLetter) {
+          optionsFromCorrectAnswers.add(la.correctLetter);
         }
       });
-    });
 
-    // If no options are configured by admin, provide minimal fallback
-    if (allOptions.size === 0) {
-      return ['A', 'B', 'C', 'D'];
+      if (optionsFromCorrectAnswers.size > 0) {
+        return Array.from(optionsFromCorrectAnswers).sort();
+      }
     }
 
-    // Sort and return admin-configured options
-    return Array.from(allOptions).sort();
-  }, [selectedAssessment]);
+    // Ultimate fallback if no group is found or no options are configured at all
+    return ['A', 'B', 'C', 'D'];
+  }, [selectedAssessment, questionNumber]);
 
   return (
     <Select

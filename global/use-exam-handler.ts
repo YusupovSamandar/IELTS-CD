@@ -7,6 +7,7 @@ import {
   getCorrectAnswerByQuestionId,
   getIdentifyInfoByQuestionId,
   getQuestion,
+  getYesNoNotGivenAnswerByQuestionId,
   updateRespond
 } from '@/actions/test-exam/question';
 import { createOrUpdateResult } from '@/actions/test-exam/result';
@@ -128,6 +129,16 @@ export const useExamHandler = () => {
             totalCorrectAnswers++;
           }
           break;
+        case 'YES_NO_NOT_GIVEN':
+          respond = userAnswer.content;
+          // await updateRespond({ questionId: question.id, respond });
+          const yesNoNotGivenAnswer = await getYesNoNotGivenAnswerByQuestionId(
+            question.id
+          );
+          if (yesNoNotGivenAnswer === respond) {
+            totalCorrectAnswers++;
+          }
+          break;
 
         case 'COMPLETION':
           respond = userAnswer.content;
@@ -203,6 +214,8 @@ export const useExamHandler = () => {
           case 'MULTI_MORE':
             return { questionNumber, type, choiceIdList: props.choiceIdList };
           case 'IDENTIFY_INFO':
+            return { questionNumber, type, content: props.content };
+          case 'YES_NO_NOT_GIVEN':
             return { questionNumber, type, content: props.content };
           case 'COMPLETION':
             return { questionNumber, type, content: props.content };

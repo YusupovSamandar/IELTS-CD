@@ -24,6 +24,20 @@ export const getIdentifyInfoByQuestionId = async (questionId: string) => {
   }
   return identifyInfo.choiceCorrect;
 };
+
+export const getYesNoNotGivenAnswerByQuestionId = async (
+  questionId: string
+) => {
+  const yesNoNotGiven = await db.yesNoNotGiven.findUnique({
+    where: { questionId },
+    select: { choiceCorrect: true }
+  });
+  if (!yesNoNotGiven) {
+    throw new Error('YesNoNotGiven not found for questionId');
+  }
+  return yesNoNotGiven.choiceCorrect;
+};
+
 export const updateRespond = async ({
   questionId,
   respond

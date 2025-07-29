@@ -255,7 +255,14 @@ export const updateLetterAnswerAnswers = async ({
       return db.letterAnswer.update({
         where: { id: letterAnswer.id },
         data: {
-          correctLetter: letterOnly
+          correctLetter: letterOnly,
+          question: {
+            update: {
+              data: {
+                correctAnswer: letterOnly
+              }
+            }
+          }
         }
       });
     });

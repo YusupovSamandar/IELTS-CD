@@ -43,19 +43,24 @@ export function MultiOneUpdateForm() {
     name: 'choices'
   });
 
+  // ✨ FIX 1: Use form.reset() to safely populate the form.
   useEffect(() => {
     if (multiOne) {
-      form.setValue('title', multiOne.title);
-      form.setValue(
-        'choices',
-        multiOne.choices.map((choice) => ({
+      form.reset({
+        title: multiOne.title,
+        choices: multiOne.choices.map((choice) => ({
           id: choice.id,
           content: choice.content,
           isCorrect: choice.isCorrect
         }))
-      );
+      });
     }
-  }, [form, multiOne]);
+  }, [multiOne, form]); // form object is stable
+
+  // ✨ FIX 2: Watch the 'choices' field to get the current correct index.
+  const choices = form.watch('choices');
+  const correctChoiceIndex =
+    choices?.findIndex((choice) => choice.isCorrect) ?? -1;
 
   if (!multiOne || !isModalOpen) {
     return null;
@@ -78,10 +83,7 @@ export function MultiOneUpdateForm() {
   };
 
   const addChoice = () => {
-    append({
-      content: '',
-      isCorrect: false
-    });
+    append({ content: '', isCorrect: false });
   };
 
   const removeChoice = (index: number) => {
@@ -91,9 +93,11 @@ export function MultiOneUpdateForm() {
   };
 
   const handleCorrectChoiceChange = (selectedIndex: number) => {
-    // Set all choices to false, then set the selected one to true
+    // This logic is fine, it updates the form state correctly.
     fields.forEach((_, index) => {
-      form.setValue(`choices.${index}.isCorrect`, index === selectedIndex);
+      form.setValue(`choices.${index}.isCorrect`, index === selectedIndex, {
+        shouldDirty: true
+      });
     });
   };
 
@@ -140,18 +144,14 @@ export function MultiOneUpdateForm() {
                   can be correct.
                 </FormDescription>
 
+                {/* ✨ FIX 3: Use the controlled `value` prop here. */}
                 <RadioGroup
+                  value={
+                    correctChoiceIndex > -1 ? correctChoiceIndex.toString() : ''
+                  }
                   onValueChange={(value) => {
-                    const selectedIndex = parseInt(value);
-                    handleCorrectChoiceChange(selectedIndex);
+                    handleCorrectChoiceChange(parseInt(value, 10));
                   }}
-                  defaultValue={fields
-                    .findIndex((field) =>
-                      form.getValues(
-                        `choices.${fields.indexOf(field)}.isCorrect`
-                      )
-                    )
-                    .toString()}
                   className="space-y-2"
                 >
                   {fields.map((field, index) => (

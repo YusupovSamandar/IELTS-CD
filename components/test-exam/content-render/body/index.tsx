@@ -23,16 +23,6 @@ import WritingBodyContentRender from '../../writing/body-content-render';
 const PartBodyContentRender = () => {
   const { selectedPart, selectedAssessment } = useContext(ExamContext);
 
-  console.log(
-    'PartBodyContentRender - selectedPart:',
-    selectedPart?.id,
-    selectedPart?.title
-  );
-  console.log(
-    'PartBodyContentRender - selectedAssessment:',
-    selectedAssessment?.id
-  );
-
   if (!selectedPart) {
     console.log('PartBodyContentRender - No selectedPart, returning null');
     return null;

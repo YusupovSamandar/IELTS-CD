@@ -7,15 +7,15 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('audio') as File;
-    const partId = formData.get('partId') as string;
+    const assessmentId = formData.get('assessmentId') as string;
 
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    if (!partId) {
+    if (!assessmentId) {
       return NextResponse.json(
-        { error: 'Part ID is required' },
+        { error: 'Assessment ID is required' },
         { status: 400 }
       );
     }
@@ -60,26 +60,26 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = new Uint8Array(bytes);
 
-    // Create listening directory if it doesn't exist
-    const listeningDir = join(process.cwd(), 'public', 'listening');
-    if (!existsSync(listeningDir)) {
-      mkdirSync(listeningDir, { recursive: true });
+    // Create uploads/audio directory if it doesn't exist (outside public folder)
+    const audioDir = join(process.cwd(), 'uploads', 'audio');
+    if (!existsSync(audioDir)) {
+      mkdirSync(audioDir, { recursive: true });
     }
 
-    // Generate a unique filename with part ID
+    // Generate a unique filename with assessment ID
     const fileExtension = fileName.split('.').pop();
-    const uniqueFileName = `${partId}_${Date.now()}.${fileExtension}`;
-    const filePath = join(listeningDir, uniqueFileName);
+    const uniqueFileName = `${assessmentId}_${Date.now()}.${fileExtension}`;
+    const filePath = join(audioDir, uniqueFileName);
 
     // Write the file
     await writeFile(filePath, buffer);
 
-    // Return the file path relative to public directory
-    const publicPath = `/listening/${uniqueFileName}`;
+    // Return the file path for API route serving
+    const apiPath = `/api/files/audio/${uniqueFileName}`;
 
     return NextResponse.json({
       message: 'File uploaded successfully',
-      filePath: publicPath,
+      filePath: apiPath,
       fileName: uniqueFileName
     });
   } catch (error) {

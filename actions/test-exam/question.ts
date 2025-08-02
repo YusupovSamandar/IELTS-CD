@@ -38,19 +38,6 @@ export const getYesNoNotGivenAnswerByQuestionId = async (
   return yesNoNotGiven.choiceCorrect;
 };
 
-export const updateRespond = async ({
-  questionId,
-  respond
-}: {
-  questionId: string;
-  respond: string;
-}) => {
-  await db.question.update({
-    where: { id: questionId },
-    data: { respond }
-  });
-};
-
 export const getQuestion = async ({
   assessmentId,
   questionNumber

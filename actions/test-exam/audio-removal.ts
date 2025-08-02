@@ -23,16 +23,20 @@ export const removeAudio = async (assessmentId: string) => {
 
     // If there's an audio path, remove the file
     if (assessment.audioPath) {
-      const filePath = join(process.cwd(), 'public', assessment.audioPath);
+      // Extract filename from API path (e.g., /api/files/audio/filename.mp3 -> filename.mp3)
+      const fileName = assessment.audioPath.split('/').pop();
+      if (fileName) {
+        const filePath = join(process.cwd(), 'uploads', 'audio', fileName);
 
-      // Check if file exists and remove it
-      if (existsSync(filePath)) {
-        try {
-          unlinkSync(filePath);
-          console.log('Audio file removed:', filePath);
-        } catch (error) {
-          console.error('Error removing audio file:', error);
-          // Continue to update database even if file removal fails
+        // Check if file exists and remove it
+        if (existsSync(filePath)) {
+          try {
+            unlinkSync(filePath);
+            console.log('Audio file removed:', filePath);
+          } catch (error) {
+            console.error('Error removing audio file:', error);
+            // Continue to update database even if file removal fails
+          }
         }
       }
     }

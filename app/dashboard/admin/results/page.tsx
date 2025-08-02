@@ -1,4 +1,5 @@
 import { getUserResults } from '@/actions/admin/user-results';
+import { UserRole } from '@prisma/client';
 import { ResultsClient } from './results-client';
 
 export default async function UserResultsPage({
@@ -8,7 +9,12 @@ export default async function UserResultsPage({
 }) {
   const query =
     typeof searchParams.query === 'string' ? searchParams.query : undefined;
-  const usersWithResults = await getUserResults({ query });
+  const role =
+    typeof searchParams.role === 'string'
+      ? (searchParams.role as UserRole)
+      : undefined;
+
+  const usersWithResults = await getUserResults({ query, role });
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-blue-100 to-blue-300 py-10 px-4">

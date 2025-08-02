@@ -1,9 +1,15 @@
 'use server';
 
-import { Prisma } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
 import { db } from '@/lib/db';
 
-export async function getUserResults({ query }: { query?: string }) {
+export async function getUserResults({ 
+  query, 
+  role 
+}: { 
+  query?: string; 
+  role?: UserRole;
+}) {
   const whereCondition: Prisma.UserWhereInput = {};
 
   if (query) {
@@ -11,6 +17,10 @@ export async function getUserResults({ query }: { query?: string }) {
       { name: { contains: query, mode: 'insensitive' } },
       { email: { contains: query, mode: 'insensitive' } }
     ];
+  }
+
+  if (role) {
+    whereCondition.role = role;
   }
 
   const usersWithResults = await db.user.findMany({
@@ -23,6 +33,43 @@ export async function getUserResults({ query }: { query?: string }) {
               id: true,
               name: true,
               sectionType: true
+            }
+          }
+        }
+      },
+      userEssays: {
+        include: {
+          assessment: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        }
+      }
+    },
+    orderBy: {
+      name: 'asc'
+    }
+  });
+
+  return usersWithResults;
+}
+
+export async function getUserResultsForExport() {
+  const usersWithResults = await db.user.findMany({
+    where: {
+      role: 'USER' // Only export USER role results
+    },
+    include: {
+      results: {
+        include: {
+          assessment: {
+            select: {
+              id: true,
+              name: true,
+              sectionType: true,
+              totalQuestions: true
             }
           }
         }

@@ -52,32 +52,32 @@ export const uploadAudio = async (formData: FormData) => {
     const bytes = await file.arrayBuffer();
     const buffer = new Uint8Array(bytes);
 
-    // Create listening directory if it doesn't exist
-    const listeningDir = join(process.cwd(), 'public', 'listening');
-    if (!existsSync(listeningDir)) {
-      mkdirSync(listeningDir, { recursive: true });
+    // Create uploads/audio directory if it doesn't exist (outside public folder)
+    const audioDir = join(process.cwd(), 'uploads', 'audio');
+    if (!existsSync(audioDir)) {
+      mkdirSync(audioDir, { recursive: true });
     }
 
     // Generate a unique filename with assessment ID
     const fileExtension = fileName.split('.').pop();
     const uniqueFileName = `${assessmentId}_${Date.now()}.${fileExtension}`;
-    const filePath = join(listeningDir, uniqueFileName);
+    const filePath = join(audioDir, uniqueFileName);
 
     // Write the file
     await writeFile(filePath, buffer);
 
-    // Return the file path relative to public directory
-    const publicPath = `/listening/${uniqueFileName}`;
+    // Return the file path for API route serving
+    const apiPath = `/api/files/audio/${uniqueFileName}`;
 
     // Save audio path to database
     await saveAudioPath({
       assessmentId,
-      audioPath: publicPath
+      audioPath: apiPath
     });
 
     return {
       message: 'File uploaded successfully',
-      filePath: publicPath,
+      filePath: apiPath,
       fileName: uniqueFileName
     };
   } catch (error) {

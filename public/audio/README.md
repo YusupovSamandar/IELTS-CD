@@ -1,19 +1,24 @@
-# Audio Files Directory
+# Audio Files Directory (DEPRECATED)
 
-This directory stores audio files for the IELTS listening sections.
+⚠️ **This directory is now deprecated. Please refer to `/uploads/` for the new dynamic file storage.**
 
-## Structure
+## Migration Notice
+
+Audio files are no longer stored in the public folder. The new system uses:
+
+- **Storage Location**: `/uploads/audio/` (outside public folder)
+- **Serving Method**: Dynamic API routes at `/api/files/audio/[...path]`
+- **Benefits**: No server restart required, immediate file access after upload
+
+## Legacy Information
+
+This directory previously stored audio files for the IELTS listening sections.
+The old structure was:
 
 - `/listening/` - Contains audio files for listening assessments
-  - Files should be named with the assessment ID or a descriptive name
-  - Supported formats: MP3 (audio/mpeg), WAV (audio/wav), OGG (audio/ogg), M4A (audio/mp4)
-  - Maximum file size: 50MB
-  - Validation: Both MIME type and file extension are checked for compatibility
 
-## Usage
+## Current Status
 
-Audio files are uploaded through the admin interface in edit mode and stored in this directory. The audio player component references these files for playback during listening assessments.
-
-## Note
-
-In a production environment, consider using a cloud storage service (like AWS S3, Google Cloud Storage, or Azure Blob Storage) for better performance and scalability.
+- ✅ New dynamic file serving implemented
+- ✅ Migration to `/uploads/` directory complete
+- ⚠️ This directory kept for reference only

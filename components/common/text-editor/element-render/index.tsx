@@ -1,7 +1,6 @@
 import { RenderElementProps } from 'slate-react';
 import CompletionBlankRender from '@/components/question-type/completion/blank-render';
 import LetterAnswerBlankRender from '@/components/question-type/letter-answer/blank-render';
-import ResultBlankRender from '@/components/score/review-and-explain/completion-render/blank';
 
 type ReadonlyElementRenderProps =
   | {
@@ -31,24 +30,6 @@ export const ElementRender = (props: ReadonlyElementRenderProps) => {
   const { attributes, children, element } = slateProps;
   switch (element.type) {
     case 'blank':
-      if (props.mode === 'result') {
-        if (props.type === 'Completion') {
-          return (
-            <ResultBlankRender
-              questionNumber={element.questionNumber}
-              assessmentId={props.assessmentId}
-            />
-          );
-        }
-        if (props.type === 'LetterAnswer') {
-          return (
-            <ResultBlankRender
-              questionNumber={element.questionNumber}
-              assessmentId={props.assessmentId}
-            />
-          );
-        }
-      }
       if (props.mode === 'edit') {
         return (
           <span {...attributes} className="bg-red-500">

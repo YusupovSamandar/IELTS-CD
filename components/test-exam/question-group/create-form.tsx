@@ -138,6 +138,13 @@ export function CreateQuestionGroupForm() {
                             ) {
                               return false;
                             }
+                            // Remove YES_NO_NOT_GIVEN from LISTENING assessments (reading only)
+                            if (
+                              selectedAssessment?.sectionType === 'LISTENING' &&
+                              type === 'YES_NO_NOT_GIVEN'
+                            ) {
+                              return false;
+                            }
                             return true;
                           })
                           .map((type) => (

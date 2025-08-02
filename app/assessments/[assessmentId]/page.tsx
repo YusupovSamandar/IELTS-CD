@@ -34,7 +34,7 @@ const AssessmentIdPage = async ({
       if (assessment?.sectionType === 'WRITING') {
         redirect('/');
       } else {
-        redirect(`/score/${params.assessmentId}`);
+        redirect('/');
       }
     }
   }

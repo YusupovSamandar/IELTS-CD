@@ -17,8 +17,8 @@ model Result {
   timeSpent           Int
   userId              String
   assessmentId        String
-  user                User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   assessment          Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  user                User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, assessmentId])
 }
@@ -49,11 +49,11 @@ model Part {
   description    String
   order          Int
   assessmentId   String
+  essayPart      EssayPart?
   assessment     Assessment      @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
   passage        Passage?
   questions      Question[]
   questionGroups QuestionGroup[]
-  essayPart      EssayPart?
 }
 
 model QuestionGroup {
@@ -69,12 +69,12 @@ model QuestionGroup {
   additionalLetterOptions String?
   completion              Completion?
   identifyInfoList        IdentifyingInformation[]
-  yesNoNotGivenList       YesNoNotGiven[]
   letterAnswers           LetterAnswer[]
   multiMoreList           MultipleChoiceMoreAnswers[]
   multiOneList            MultipleChoiceOneAnswer[]
   questions               Question[]
   part                    Part                        @relation(fields: [partId], references: [id], onDelete: Cascade)
+  yesNoNotGivenList       YesNoNotGiven[]
 }
 
 model Question {
@@ -83,13 +83,11 @@ model Question {
   updatedAt       DateTime                   @default(now()) @updatedAt
   questionNumber  Int
   correctAnswer   String
-  respond         String?
   questionGroupId String
   partId          String
   assessmentId    String
   completionId    String?
   identifyInfo    IdentifyingInformation?
-  yesNoNotGiven   YesNoNotGiven?
   letterAnswer    LetterAnswer?
   multiMore       MultipleChoiceMoreAnswers?
   multiOne        MultipleChoiceOneAnswer?
@@ -97,6 +95,7 @@ model Question {
   completion      Completion?                @relation(fields: [completionId], references: [id])
   part            Part                       @relation(fields: [partId], references: [id], onDelete: Cascade)
   questionGroup   QuestionGroup              @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
+  yesNoNotGiven   YesNoNotGiven?
 
   @@unique([assessmentId, questionNumber])
 }
@@ -178,10 +177,10 @@ model LetterAnswer {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @default(now()) @updatedAt
   title           String
-  paragraph       String?
   correctLetter   String
   questionId      String        @unique
   questionGroupId String
+  paragraph       String?
   questionGroup   QuestionGroup @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
   question        Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
 }
@@ -289,8 +288,8 @@ model EssayPart {
   image        String?
   maxWords     Int        @default(250)
   assessmentId String
-  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
   partId       String     @unique
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
   part         Part       @relation(fields: [partId], references: [id], onDelete: Cascade)
 }
 
@@ -322,10 +321,10 @@ enum QuestionType {
   MULTIPLE_CHOICE_ONE_ANSWER
   MULTIPLE_CHOICE_MORE_ANSWERS
   IDENTIFYING_INFORMATION
-  YES_NO_NOT_GIVEN
   COMPLETION
   TABLE_COMPLETION
   LETTER_ANSWER
+  YES_NO_NOT_GIVEN
 }
 
 enum IdentifyChoice {

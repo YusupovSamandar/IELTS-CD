@@ -11,37 +11,35 @@ export const hasUserCompletedAssessment = async (assessmentId: string) => {
       return false;
     }
 
-    // Check if assessment is a writing assessment
-    const assessment = await db.assessment.findUnique({
+    // Single optimized query to check completion for all assessment types
+    // This combines the assessment lookup with the completion check
+    const completionCheck = await db.assessment.findUnique({
       where: { id: assessmentId },
-      select: { sectionType: true }
+      select: {
+        sectionType: true,
+        results: {
+          where: { userId: user.id },
+          select: { id: true },
+          take: 1
+        },
+        userEssays: {
+          where: { userId: user.id },
+          select: { id: true },
+          take: 1
+        }
+      }
     });
 
-    if (!assessment) {
+    if (!completionCheck) {
       return false;
     }
 
-    // For writing assessments, check UserEssay table
-    if (assessment.sectionType === 'WRITING') {
-      const userEssay = await db.userEssay.findUnique({
-        where: {
-          userId_assessmentId: {
-            userId: user.id,
-            assessmentId: assessmentId
-          }
-        }
-      });
-      return !!userEssay;
+    // Check completion based on assessment type
+    if (completionCheck.sectionType === 'WRITING') {
+      return completionCheck.userEssays.length > 0;
+    } else {
+      return completionCheck.results.length > 0;
     }
-
-    // For other assessments, check Result table
-    const result = await db.$queryRaw`
-      SELECT id FROM "Result" 
-      WHERE "userId" = ${user.id} AND "assessmentId" = ${assessmentId}
-      LIMIT 1
-    `;
-
-    return Array.isArray(result) && result.length > 0;
   } catch (error) {
     console.error('Error checking assessment completion:', error);
     return false;
@@ -55,39 +53,36 @@ export const checkUserCompletionStatus = async () => {
     return { completed: false, totalCount: 0, completedCount: 0 };
   }
 
-  // Get all public assessments with their types
-  const allAssessments = await db.assessment.findMany({
-    where: {},
-    select: { id: true, sectionType: true }
+  // Single optimized query to get all assessments with completion status
+  const assessmentsWithCompletion = await db.assessment.findMany({
+    select: {
+      id: true,
+      sectionType: true,
+      results: {
+        where: { userId: user.id },
+        select: { id: true },
+        take: 1
+      },
+      userEssays: {
+        where: { userId: user.id },
+        select: { id: true },
+        take: 1
+      }
+    }
   });
 
   let completedCount = 0;
 
-  // Check completion for each assessment individually
-  for (const assessment of allAssessments) {
+  // Check completion for each assessment
+  for (const assessment of assessmentsWithCompletion) {
     if (assessment.sectionType === 'WRITING') {
-      // Check UserEssay table for writing assessments
-      const userEssay = await db.userEssay.findUnique({
-        where: {
-          userId_assessmentId: {
-            userId: user.id,
-            assessmentId: assessment.id
-          }
-        }
-      });
-      if (userEssay) completedCount++;
+      if (assessment.userEssays.length > 0) completedCount++;
     } else {
-      // Check Result table for other assessments
-      const result = await db.$queryRaw`
-        SELECT id FROM "Result" 
-        WHERE "userId" = ${user.id} AND "assessmentId" = ${assessment.id}
-        LIMIT 1
-      `;
-      if (Array.isArray(result) && result.length > 0) completedCount++;
+      if (assessment.results.length > 0) completedCount++;
     }
   }
 
-  const totalCount = allAssessments.length;
+  const totalCount = assessmentsWithCompletion.length;
 
   return {
     completed: completedCount >= totalCount && totalCount > 0,

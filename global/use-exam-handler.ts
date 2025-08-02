@@ -7,8 +7,7 @@ import {
   getCorrectAnswerByQuestionId,
   getIdentifyInfoByQuestionId,
   getQuestion,
-  getYesNoNotGivenAnswerByQuestionId,
-  updateRespond
+  getYesNoNotGivenAnswerByQuestionId
 } from '@/actions/test-exam/question';
 import { createOrUpdateResult } from '@/actions/test-exam/result';
 import { number } from 'zod';
@@ -63,7 +62,7 @@ export const useExamHandler = () => {
 
         // Navigate immediately and keep modal open
         setMode(null);
-        window.location.href = '/'; // Use window.location for immediate navigation
+        window.location.href = '/'; // Redirect to home page
         return;
       } catch (error) {
         console.error('Error submitting writing essay:', error);
@@ -83,12 +82,10 @@ export const useExamHandler = () => {
         assessmentId: selectedAssessment.id,
         questionNumber: userAnswer.questionNumber
       });
-      let respond;
+
       switch (userAnswer.type) {
         case 'MULTIPLE_CHOICE_ONE_ANSWER':
           const choice = await getChoiceById(userAnswer.choiceId);
-          respond = CHOICE_OPTIONS[choice.order];
-          await updateRespond({ questionId: question.id, respond });
           if (choice.isCorrect === true) {
             totalCorrectAnswers++;
           }
@@ -120,30 +117,24 @@ export const useExamHandler = () => {
           break;
 
         case 'IDENTIFY_INFO':
-          respond = userAnswer.content;
-          await updateRespond({ questionId: question.id, respond });
           const identifyCorrectAnswer = await getIdentifyInfoByQuestionId(
             question.id
           );
-          if (identifyCorrectAnswer === respond) {
+          if (identifyCorrectAnswer === userAnswer.content) {
             totalCorrectAnswers++;
           }
           break;
         case 'YES_NO_NOT_GIVEN':
-          respond = userAnswer.content;
-          // await updateRespond({ questionId: question.id, respond });
           const yesNoNotGivenAnswer = await getYesNoNotGivenAnswerByQuestionId(
             question.id
           );
-          if (yesNoNotGivenAnswer === respond) {
+          if (yesNoNotGivenAnswer === userAnswer.content) {
             totalCorrectAnswers++;
           }
           break;
 
         case 'COMPLETION':
-          respond = userAnswer.content;
-          await updateRespond({ questionId: question.id, respond });
-          if (question.correctAnswer === respond) {
+          if (question.correctAnswer === userAnswer.content) {
             totalCorrectAnswers++;
           }
           break;
@@ -181,7 +172,7 @@ export const useExamHandler = () => {
 
     // Navigate immediately and keep modal open
     setMode(null);
-    window.location.href = '/'; // Use window.location for immediate navigation
+    window.location.href = '/'; // Redirect to home page
 
     console.log('🚀 ~ handleSubmit ~ score:', score);
   }, [

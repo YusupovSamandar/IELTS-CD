@@ -50,32 +50,32 @@ export const uploadEssayImage = async (formData: FormData) => {
     const bytes = await file.arrayBuffer();
     const buffer = new Uint8Array(bytes);
 
-    // Create writing directory if it doesn't exist
-    const writingDir = join(process.cwd(), 'public', 'writing');
-    if (!existsSync(writingDir)) {
-      mkdirSync(writingDir, { recursive: true });
+    // Create uploads/images directory if it doesn't exist (outside public folder)
+    const imagesDir = join(process.cwd(), 'uploads', 'images');
+    if (!existsSync(imagesDir)) {
+      mkdirSync(imagesDir, { recursive: true });
     }
 
     // Generate a unique filename with essay part ID
     const fileExtension = fileName.split('.').pop();
     const uniqueFileName = `${essayPartId}_${Date.now()}.${fileExtension}`;
-    const filePath = join(writingDir, uniqueFileName);
+    const filePath = join(imagesDir, uniqueFileName);
 
     // Write the file
     await writeFile(filePath, buffer);
 
-    // Return the file path relative to public directory
-    const publicPath = `/writing/${uniqueFileName}`;
+    // Return the file path for API route serving
+    const apiPath = `/api/files/images/${uniqueFileName}`;
 
     // Save image path to database
     await saveEssayImagePath({
       essayPartId,
-      imagePath: publicPath
+      imagePath: apiPath
     });
 
     return {
       message: 'Image uploaded successfully',
-      filePath: publicPath,
+      filePath: apiPath,
       fileName: uniqueFileName
     };
   } catch (error) {

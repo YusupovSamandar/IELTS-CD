@@ -15,6 +15,9 @@ function OpenAssessmentModal() {
   const [isPending, startTransition] = useTransition();
   const [isCompleted, setIsCompleted] = useState(false);
   const [checkingCompletion, setCheckingCompletion] = useState(true);
+  const [completionCache, setCompletionCache] = useState<
+    Record<string, boolean>
+  >({});
   const { setMode } = useContext(ExamContext);
   const router = useRouter();
   const { isOpen, data, type, onClose } = useEditHook();
@@ -22,16 +25,30 @@ function OpenAssessmentModal() {
   const assessment = data?.assessment;
   const userRole = data?.userRole || 'USER';
 
-  // Check if assessment has been completed
+  // Check if assessment has been completed with caching
   useEffect(() => {
     if (assessment && isModalOpen) {
+      // Check cache first
+      if (completionCache[assessment.id] !== undefined) {
+        setIsCompleted(completionCache[assessment.id]);
+        setCheckingCompletion(false);
+        return;
+      }
+
       setCheckingCompletion(true);
       hasUserCompletedAssessment(assessment.id)
-        .then(setIsCompleted)
+        .then((completed) => {
+          setIsCompleted(completed);
+          // Cache the result
+          setCompletionCache((prev) => ({
+            ...prev,
+            [assessment.id]: completed
+          }));
+        })
         .catch(() => setIsCompleted(false))
         .finally(() => setCheckingCompletion(false));
     }
-  }, [assessment, isModalOpen]);
+  }, [assessment, isModalOpen, completionCache]);
 
   if (!assessment || !isModalOpen) {
     return null;

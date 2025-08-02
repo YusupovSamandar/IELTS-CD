@@ -23,16 +23,20 @@ export const removeEssayImage = async (essayPartId: string) => {
 
     // If there's an image path, remove the file
     if (essayPart.image) {
-      const filePath = join(process.cwd(), 'public', essayPart.image);
+      // Extract filename from API path (e.g., /api/files/images/filename.jpg -> filename.jpg)
+      const fileName = essayPart.image.split('/').pop();
+      if (fileName) {
+        const filePath = join(process.cwd(), 'uploads', 'images', fileName);
 
-      // Check if file exists and remove it
-      if (existsSync(filePath)) {
-        try {
-          unlinkSync(filePath);
-          console.log('Image file removed:', filePath);
-        } catch (error) {
-          console.error('Error removing image file:', error);
-          // Continue to update database even if file removal fails
+        // Check if file exists and remove it
+        if (existsSync(filePath)) {
+          try {
+            unlinkSync(filePath);
+            console.log('Image file removed:', filePath);
+          } catch (error) {
+            console.error('Error removing image file:', error);
+            // Continue to update database even if file removal fails
+          }
         }
       }
     }

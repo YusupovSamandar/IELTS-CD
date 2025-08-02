@@ -1,0 +1,8 @@
+# Uploaded Files
+# Keep the directory structure but ignore the actual files
+uploads/audio/*
+uploads/images/*
+
+# Keep the directories themselves
+!uploads/audio/.gitkeep
+!uploads/images/.gitkeep

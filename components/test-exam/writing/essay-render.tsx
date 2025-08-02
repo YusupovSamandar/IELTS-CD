@@ -2,6 +2,7 @@
 
 import { useContext, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { removeEssayImage } from '@/actions/test-exam/essay-image-removal';
 import { uploadEssayImage } from '@/actions/test-exam/essay-image-upload';
 import { EssayPart } from '@prisma/client';
@@ -30,6 +31,7 @@ const WritingEssayRender = ({
   const [wordCount, setWordCount] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   // Count words in the text
   useEffect(() => {
@@ -59,7 +61,8 @@ const WritingEssayRender = ({
     try {
       await uploadEssayImage(formData);
       toast.success('Image uploaded successfully');
-      window.location.reload();
+      // Use router refresh instead of window.location.reload()
+      router.refresh();
     } catch (error) {
       console.error('Upload error:', error);
       toast.error('Failed to upload image');
@@ -75,7 +78,8 @@ const WritingEssayRender = ({
     try {
       await removeEssayImage(essayPart.id);
       toast.success('Image removed successfully');
-      window.location.reload();
+      // Use router refresh instead of window.location.reload()
+      router.refresh();
     } catch (error) {
       console.error('Remove error:', error);
       toast.error('Failed to remove image');

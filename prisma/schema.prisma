@@ -87,6 +87,7 @@ model Question {
   partId          String
   assessmentId    String
   completionId    String?
+  respond         String?
   identifyInfo    IdentifyingInformation?
   letterAnswer    LetterAnswer?
   multiMore       MultipleChoiceMoreAnswers?
@@ -162,16 +163,6 @@ model YesNoNotGiven {
   question        Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
 }
 
-model Completion {
-  id              String        @id @default(cuid())
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @default(now()) @updatedAt
-  paragraph       String
-  questionGroupId String        @unique
-  questionGroup   QuestionGroup @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
-  questions       Question[]
-}
-
 model LetterAnswer {
   id              String        @id @default(cuid())
   createdAt       DateTime      @default(now())
@@ -183,6 +174,16 @@ model LetterAnswer {
   paragraph       String?
   questionGroup   QuestionGroup @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
   question        Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model Completion {
+  id              String        @id @default(cuid())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
+  paragraph       String
+  questionGroupId String        @unique
+  questionGroup   QuestionGroup @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
+  questions       Question[]
 }
 
 model PassageHeading {

@@ -4,16 +4,7 @@ import { fileURLToPath } from 'url';
 const nextConfig = {
   // Optimize for faster local startup
   experimental: {
-    serverComponentsExternalPackages: ['@prisma/client'],
-    // Enable faster refresh in development
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js'
-        }
-      }
-    }
+    serverComponentsExternalPackages: ['@prisma/client']
   },
 
   // Reduce JavaScript bundle size

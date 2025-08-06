@@ -3,6 +3,7 @@ import {
   Choice,
   Completion,
   EssayPart,
+  IdentifyChoice,
   IdentifyingInformation,
   MultipleChoiceMoreAnswers,
   MultipleChoiceOneAnswer,
@@ -11,8 +12,7 @@ import {
   PassageHeading,
   Question,
   QuestionGroup,
-  QuestionType,
-  YesNoNotGiven
+  QuestionType
 } from '@prisma/client';
 
 export type AssessmentExtended = Assessment & {
@@ -52,7 +52,14 @@ export type MultiMoreExtended = MultipleChoiceMoreAnswers & {
 export type IdentifyInfoExtended = IdentifyingInformation & {
   question: Question;
 };
-export type YesNoNotGivenExtended = YesNoNotGiven & {
+export type YesNoNotGivenExtended = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  title: string;
+  choiceCorrect: IdentifyChoice;
+  questionId: string;
+  questionGroupId: string;
   question: Question;
 };
 export type LetterAnswerExtended = {

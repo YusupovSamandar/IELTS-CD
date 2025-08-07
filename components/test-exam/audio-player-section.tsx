@@ -26,10 +26,10 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSeeking, setIsSeeking] = useState(false); // <-- 1. Add seeking state
 
   const isEditMode = mode === 'edit';
 
-  // Auto-play audio when component mounts in simulation/test mode
   useEffect(() => {
     if (!isEditMode && assessment.audioPath && audioRef.current) {
       const playAudio = async () => {
@@ -44,13 +44,11 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
     }
   }, [isEditMode, assessment.audioPath]);
 
-  // Early return check - must be after ALL hooks
   if (!assessment.audioPath && !isEditMode) {
-    return null; // Don't show anything if no audio in simulation/test mode
+    return null;
   }
 
   const handlePlayPause = () => {
-    // Only allow play/pause in edit mode
     if (isEditMode && audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
@@ -62,7 +60,8 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
   };
 
   const handleTimeUpdate = () => {
-    if (audioRef.current) {
+    // 2. Only update time if user is not dragging the slider
+    if (audioRef.current && !isSeeking) {
       setCurrentTime(audioRef.current.currentTime);
     }
   };
@@ -109,7 +108,6 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
     try {
       const result = await uploadAudio(formData);
       toast.success('Audio uploaded successfully');
-      // Reload the page to get the updated audio path
       window.location.reload();
     } catch (error) {
       console.error('Upload error:', error);
@@ -135,7 +133,6 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
 
   return (
     <div className="bg-background border border-border p-4 rounded-lg mb-4">
-      {/* Edit Mode - Full Controls */}
       {isEditMode && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -208,12 +205,15 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
                   <span className="text-sm text-muted-foreground">
                     {formatTime(currentTime)}
                   </span>
+                  {/* 3. Add mouse events to the slider */}
                   <input
                     type="range"
                     min="0"
                     max={duration || 0}
                     value={currentTime}
                     onChange={handleSeek}
+                    onMouseDown={() => setIsSeeking(true)}
+                    onMouseUp={() => setIsSeeking(false)}
                     className="flex-1 h-2 bg-secondary rounded-lg appearance-none cursor-pointer"
                   />
                   <span className="text-sm text-muted-foreground">
@@ -239,7 +239,6 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
         </div>
       )}
 
-      {/* Simulation/Test Mode - Audio Only Label with Volume Control */}
       {!isEditMode && assessment.audioPath && (
         <div className="flex items-center justify-center py-3 space-x-6">
           <audio
@@ -260,7 +259,6 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
             </span>
           </div>
 
-          {/* Volume Control for Practice/Simulation Mode */}
           <div className="flex items-center space-x-2">
             <Volume2 className="h-4 w-4 text-muted-foreground" />
             <input

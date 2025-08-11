@@ -13,7 +13,7 @@ interface RootPageClientProps {
 export const RootPageClient = ({ assessments, user }: RootPageClientProps) => {
   return (
     <ContentSection
-      title="Latest IELTS test releases"
+      title="Available exams"
       href="/"
       linkText="View all test"
       className="pt-8 md:pt-10 lg:pt-12"

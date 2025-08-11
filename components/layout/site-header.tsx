@@ -3,6 +3,7 @@ import { ExtendedUser } from '@/auth';
 import { DashboardIcon, ExitIcon, GearIcon } from '@radix-ui/react-icons';
 import { siteConfig } from '@/config/routes/root-route';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { buttonVariants } from '@/components/ui/button';
 import { Button } from '@/components/ui/button';
@@ -48,6 +49,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
 
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-2">
+            <ThemeToggle />
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

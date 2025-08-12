@@ -16,34 +16,38 @@ export const createMultiOneList = async (
   assessmentId: string
 ) => {
   const totalQuestions = getTotalQuestions(questionGroup);
-  Array.from({ length: totalQuestions }).map(
-    async (_, questionIndex) =>
-      await db.question.create({
-        data: {
-          questionNumber: questionGroup.startQuestionNumber + questionIndex,
-          questionGroupId: questionGroup.id,
-          correctAnswer: CHOICE_OPTIONS[0],
-          partId: questionGroup.partId,
-          assessmentId: assessmentId,
-          multiOne: {
-            create: {
-              title: 'This is title for multi one question',
-              questionGroupId: questionGroup.id,
-              choices: {
-                createMany: {
-                  data: Array.from({ length: CHOICE_OPTIONS.length }).map(
-                    (_, choiceIndex) => ({
-                      content: `Option ${choiceIndex + 1}`,
-                      order: choiceIndex,
-                      isCorrect: choiceIndex === 0 ? true : false
-                    })
-                  )
+
+  // Use Promise.all to wait for all questions to be created
+  await Promise.all(
+    Array.from({ length: totalQuestions }).map(
+      async (_, questionIndex) =>
+        await db.question.create({
+          data: {
+            questionNumber: questionGroup.startQuestionNumber + questionIndex,
+            questionGroupId: questionGroup.id,
+            correctAnswer: CHOICE_OPTIONS[0],
+            partId: questionGroup.partId,
+            assessmentId: assessmentId,
+            multiOne: {
+              create: {
+                title: 'This is title for multi one question',
+                questionGroupId: questionGroup.id,
+                choices: {
+                  createMany: {
+                    data: Array.from({ length: CHOICE_OPTIONS.length }).map(
+                      (_, choiceIndex) => ({
+                        content: `Option ${choiceIndex + 1}`,
+                        order: choiceIndex,
+                        isCorrect: choiceIndex === 0 ? true : false
+                      })
+                    )
+                  }
                 }
               }
             }
           }
-        }
-      })
+        })
+    )
   );
 };
 

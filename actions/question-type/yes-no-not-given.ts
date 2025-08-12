@@ -12,24 +12,28 @@ export const createYesNoNotGivenList = async (
   assessmentId: string
 ) => {
   const totalQuestions = getTotalQuestions(questionGroup);
-  Array.from({ length: totalQuestions }).map(
-    async (_, questionIndex) =>
-      await db.question.create({
-        data: {
-          questionNumber: questionGroup.startQuestionNumber + questionIndex,
-          questionGroupId: questionGroup.id,
-          correctAnswer: 'TRUE',
-          partId: questionGroup.partId,
-          assessmentId: assessmentId,
-          yesNoNotGiven: {
-            create: {
-              questionGroupId: questionGroup.id,
-              title: 'This is title for yes/no/not given question',
-              choiceCorrect: IdentifyChoice.TRUE
+
+  // Use Promise.all to wait for all questions to be created
+  await Promise.all(
+    Array.from({ length: totalQuestions }).map(
+      async (_, questionIndex) =>
+        await db.question.create({
+          data: {
+            questionNumber: questionGroup.startQuestionNumber + questionIndex,
+            questionGroupId: questionGroup.id,
+            correctAnswer: 'TRUE',
+            partId: questionGroup.partId,
+            assessmentId: assessmentId,
+            yesNoNotGiven: {
+              create: {
+                questionGroupId: questionGroup.id,
+                title: 'This is title for yes/no/not given question',
+                choiceCorrect: IdentifyChoice.TRUE
+              }
             }
           }
-        }
-      })
+        })
+    )
   );
 };
 

@@ -3,6 +3,7 @@ import { Check } from 'lucide-react';
 import { ExamContext } from '@/global/exam-context';
 import { useExamHandler } from '@/global/use-exam-handler';
 import { cn } from '@/lib/utils';
+import { useTabPreservation } from '@/hooks/use-tab-preservation';
 import { Button } from '@/components/ui/button';
 import { TabsList } from '@/components/ui/tabs';
 
@@ -16,6 +17,7 @@ function FooterContentRender() {
     currentRef: currentQuestionIndex
   } = useContext(ExamContext);
   const { handleSubmit } = useExamHandler();
+  const { setCurrentTab } = useTabPreservation();
   if (!selectedAssessment) {
     return null;
   }
@@ -34,7 +36,10 @@ function FooterContentRender() {
                 : 'hover:bg-muted hover:text-foreground'
             )}
             variant={activeTab === part.id ? 'default' : 'outline'}
-            onClick={() => setActiveTab(part.id)}
+            onClick={() => {
+              setActiveTab(part.id);
+              setCurrentTab(part.id);
+            }}
           >
             <span className="font-medium whitespace-nowrap">{part.title}</span>
           </Button>
@@ -98,7 +103,10 @@ function FooterContentRender() {
                 'hover:bg-muted hover:text-foreground'
               )}
               variant="outline"
-              onClick={() => setActiveTab(part.id)}
+              onClick={() => {
+                setActiveTab(part.id);
+                setCurrentTab(part.id);
+              }}
             >
               <span className="text-sm font-medium">{part.title}</span>
             </Button>

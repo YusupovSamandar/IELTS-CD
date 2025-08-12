@@ -17,7 +17,7 @@ export function LetterAnswer({
   value = '',
   onChange,
   disabled = false,
-  placeholder = 'Enter a letter (A-Z)'
+  placeholder = 'Enter answer (e.g., A, B1, C23)'
 }: LetterAnswerProps) {
   const [inputValue, setInputValue] = useState(value);
 
@@ -28,14 +28,14 @@ export function LetterAnswer({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
 
-    // Only allow letters and automatically capitalize
-    const letterOnly = input.replace(/[^a-zA-Z]/g, '').toUpperCase();
+    // Only allow letters and numbers, automatically capitalize
+    const alphanumericOnly = input.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 
-    // Limit to single character
-    const singleLetter = letterOnly.slice(0, 1);
+    // Limit to 10 characters
+    const limitedAnswer = alphanumericOnly.slice(0, 10);
 
-    setInputValue(singleLetter);
-    onChange?.(singleLetter);
+    setInputValue(limitedAnswer);
+    onChange?.(limitedAnswer);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -51,10 +51,11 @@ export function LetterAnswer({
       return;
     }
 
-    // Ensure that it is a letter and stop if not
+    // Ensure that it is a letter or number and stop if not
     if (
-      (e.keyCode < 65 || e.keyCode > 90) &&
-      (e.keyCode < 97 || e.keyCode > 122)
+      (e.keyCode < 48 || e.keyCode > 57) && // Numbers 0-9
+      (e.keyCode < 65 || e.keyCode > 90) && // Letters A-Z
+      (e.keyCode < 97 || e.keyCode > 122) // Letters a-z
     ) {
       e.preventDefault();
     }
@@ -63,7 +64,7 @@ export function LetterAnswer({
   return (
     <div className="space-y-2">
       <Label htmlFor={`letter-${questionId}`} className="text-sm font-medium">
-        Answer (Single Letter)
+        Answer
       </Label>
       <Input
         id={`letter-${questionId}`}
@@ -73,12 +74,12 @@ export function LetterAnswer({
         onKeyDown={handleKeyDown}
         disabled={disabled}
         placeholder={placeholder}
-        className="w-16 h-16 text-center text-2xl font-bold uppercase"
-        maxLength={1}
+        className="w-32 h-12 text-center text-xl font-bold uppercase"
+        maxLength={10}
         autoComplete="off"
       />
       <p className="text-xs text-muted-foreground">
-        Enter a single letter (A-Z)
+        Enter letters and/or numbers (e.g., A, B1, C23)
       </p>
     </div>
   );

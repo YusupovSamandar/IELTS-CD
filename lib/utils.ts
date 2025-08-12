@@ -84,6 +84,27 @@ export const createUrl = (
   return `${pathname}${queryString}`;
 };
 
+export function createUrlWithCurrentTab(
+  pathname: string,
+  params: URLSearchParams | ReadonlyURLSearchParams,
+  currentTab?: string
+): string {
+  const newParams = new URLSearchParams(params);
+
+  if (currentTab) {
+    newParams.set('currentTab', currentTab);
+  }
+
+  return createUrl(pathname, newParams);
+}
+
+export function getCurrentTabFromUrl(): string | null {
+  if (typeof window === 'undefined') return null;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('currentTab');
+}
+
 export function catchError(err: unknown) {
   if (err instanceof z.ZodError) {
     const errors = err.issues.map((issue) => {

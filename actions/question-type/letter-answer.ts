@@ -15,10 +15,15 @@ export const createLetterAnswer = async (data: LetterAnswerData) => {
   try {
     const { questionGroupId, questionId, title, correctLetter } = data;
 
-    // Validate that correctLetter is a single letter
-    const letterOnly = correctLetter.replace(/[^a-zA-Z]/g, '').toUpperCase();
-    if (letterOnly.length !== 1) {
-      return { error: 'Answer must be a single letter' };
+    // Updated validation to allow alphanumeric characters
+    const cleanAnswer = correctLetter.trim().toUpperCase();
+    if (cleanAnswer.length === 0) {
+      return { error: 'Answer is required' };
+    }
+
+    // Allow letters and numbers, but no special characters
+    if (!/^[A-Z0-9]+$/.test(cleanAnswer)) {
+      return { error: 'Answer must contain only letters and numbers' };
     }
 
     const letterAnswer = await db.letterAnswer.create({
@@ -26,7 +31,7 @@ export const createLetterAnswer = async (data: LetterAnswerData) => {
         questionGroupId,
         questionId,
         title,
-        correctLetter: letterOnly
+        correctLetter: cleanAnswer
       }
     });
 
@@ -48,15 +53,18 @@ export const updateLetterAnswer = async (
   try {
     const updateData: any = { ...data };
 
-    // Validate correctLetter if provided
+    // Updated validation to allow alphanumeric characters
     if (data.correctLetter) {
-      const letterOnly = data.correctLetter
-        .replace(/[^a-zA-Z]/g, '')
-        .toUpperCase();
-      if (letterOnly.length !== 1) {
-        return { error: 'Answer must be a single letter' };
+      const cleanAnswer = data.correctLetter.trim().toUpperCase();
+      if (cleanAnswer.length === 0) {
+        return { error: 'Answer is required' };
       }
-      updateData.correctLetter = letterOnly;
+
+      // Allow letters and numbers, but no special characters
+      if (!/^[A-Z0-9]+$/.test(cleanAnswer)) {
+        return { error: 'Answer must contain only letters and numbers' };
+      }
+      updateData.correctLetter = cleanAnswer;
     }
 
     const letterAnswer = await db.letterAnswer.update({
@@ -245,21 +253,25 @@ export const updateLetterAnswerAnswers = async ({
 
     // Update each letter answer
     const updatePromises = letterAnswers.map((letterAnswer) => {
-      const letterOnly = letterAnswer.correctLetter
-        .replace(/[^a-zA-Z]/g, '')
-        .toUpperCase();
-      if (letterOnly.length !== 1) {
-        throw new Error(`Answer must be a single letter for question`);
+      const cleanAnswer = letterAnswer.correctLetter.trim().toUpperCase();
+
+      if (cleanAnswer.length === 0) {
+        throw new Error(`Answer is required for question`);
+      }
+
+      // Allow letters and numbers, but no special characters
+      if (!/^[A-Z0-9]+$/.test(cleanAnswer)) {
+        throw new Error(`Answer must contain only letters and numbers`);
       }
 
       return db.letterAnswer.update({
         where: { id: letterAnswer.id },
         data: {
-          correctLetter: letterOnly,
+          correctLetter: cleanAnswer,
           question: {
             update: {
               data: {
-                correctAnswer: letterOnly
+                correctAnswer: cleanAnswer
               }
             }
           }

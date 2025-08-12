@@ -51,8 +51,8 @@ function LetterAnswerBlankRender({
       if (currentQuestionGroup.additionalLetterOptions) {
         const options = currentQuestionGroup.additionalLetterOptions
           .split(',')
-          .map((letter) => letter.trim().toUpperCase())
-          .filter((letter) => /^[A-Z]$/.test(letter));
+          .map((option) => option.trim().toUpperCase())
+          .filter((option) => option.length > 0 && /^[A-Z0-9]+$/.test(option));
 
         if (options.length > 0) {
           return options.sort();

@@ -72,7 +72,7 @@ const AssessmentRender = ({
     <div className="max-h-screen h-screen flex flex-col relative">
       <TextExamHeaderRender />
       <TestExamContentRender />
-      
+
       {/* Disable exam interface when submitting */}
       {isSubmit && (
         <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-50 pointer-events-auto">

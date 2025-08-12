@@ -25,9 +25,9 @@ const letterAnswerSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   correctLetter: z
     .string()
-    .min(1, 'Letter is required')
-    .max(1, 'Must be a single letter')
-    .regex(/^[A-Z]$/, 'Must be a capital letter A-Z')
+    .min(1, 'Answer is required')
+    .max(10, 'Must be 10 characters or less')
+    .regex(/^[A-Z0-9]+$/, 'Must contain only capital letters and numbers')
 });
 
 type LetterAnswerFormData = z.infer<typeof letterAnswerSchema>;
@@ -87,14 +87,14 @@ export function LetterAnswerForm({
     });
   };
 
-  const handleLetterChange = (value: string) => {
-    // Only allow letters and automatically capitalize
-    const letterOnly = value.replace(/[^a-zA-Z]/g, '').toUpperCase();
+  const handleAnswerChange = (value: string) => {
+    // Only allow letters and numbers, automatically capitalize
+    const alphanumericOnly = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 
-    // Limit to single character
-    const singleLetter = letterOnly.slice(0, 1);
+    // Limit to 10 characters
+    const limitedAnswer = alphanumericOnly.slice(0, 10);
 
-    form.setValue('correctLetter', singleLetter);
+    form.setValue('correctLetter', limitedAnswer);
   };
 
   return (
@@ -123,15 +123,15 @@ export function LetterAnswerForm({
           name="correctLetter"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Correct Answer (Single Letter)</FormLabel>
+              <FormLabel>Correct Answer</FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   disabled={isPending}
-                  placeholder="A"
-                  maxLength={1}
-                  className="w-16 h-16 text-center text-2xl font-bold uppercase"
-                  onChange={(e) => handleLetterChange(e.target.value)}
+                  placeholder="A1"
+                  maxLength={10}
+                  className="w-32 h-12 text-center text-xl font-bold uppercase"
+                  onChange={(e) => handleAnswerChange(e.target.value)}
                   onKeyDown={(e) => {
                     // Allow backspace, delete, tab, escape, enter
                     if (
@@ -145,10 +145,11 @@ export function LetterAnswerForm({
                       return;
                     }
 
-                    // Ensure that it is a letter and stop if not
+                    // Ensure that it is a letter or number and stop if not
                     if (
-                      (e.keyCode < 65 || e.keyCode > 90) &&
-                      (e.keyCode < 97 || e.keyCode > 122)
+                      (e.keyCode < 48 || e.keyCode > 57) && // Numbers 0-9
+                      (e.keyCode < 65 || e.keyCode > 90) && // Letters A-Z
+                      (e.keyCode < 97 || e.keyCode > 122) // Letters a-z
                     ) {
                       e.preventDefault();
                     }
@@ -157,7 +158,7 @@ export function LetterAnswerForm({
               </FormControl>
               <FormMessage />
               <p className="text-xs text-muted-foreground">
-                Enter a single letter (A-Z)
+                Enter letters and/or numbers (e.g., A, B1, C23)
               </p>
             </FormItem>
           )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useTransition } from 'react';
+import { useMemo, useTransition } from 'react';
 import { updateLetterAnswerAnswers } from '@/actions/question-type/letter-answer';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -18,7 +18,13 @@ import {
   FormLabel,
   FormMessage
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 
 const LetterAnswerSchema = z.object({
   letterAnswers: z.array(
@@ -26,9 +32,8 @@ const LetterAnswerSchema = z.object({
       id: z.string(),
       correctLetter: z
         .string()
-        .min(1, 'Letter is required')
-        .max(1, 'Must be a single letter')
-        .regex(/^[A-Z]$/, 'Must be a capital letter A-Z')
+        .min(1, 'Answer is required')
+        .regex(/^[A-Z0-9]+$/, 'Answer must contain only letters and numbers')
     })
   )
 });
@@ -43,26 +48,38 @@ export function LetterAnswerUpdateForm() {
     [questionGroup?.letterAnswers]
   );
 
+  // Get available options from question group's additionalLetterOptions
+  const availableOptions = useMemo(() => {
+    if (!questionGroup?.additionalLetterOptions) {
+      return ['A', 'B', 'C', 'D', 'E', 'F']; // Default options
+    }
+
+    return questionGroup.additionalLetterOptions
+      .split(',')
+      .map((option) => option.trim().toUpperCase())
+      .filter((option) => option.length > 0 && /^[A-Z0-9]+$/.test(option))
+      .sort();
+  }, [questionGroup?.additionalLetterOptions]);
+
+  const defaultValues = useMemo(
+    () => ({
+      letterAnswers: letterAnswers.map((letterAnswer) => ({
+        id: letterAnswer.id,
+        correctLetter: letterAnswer.correctLetter || ''
+      }))
+    }),
+    [letterAnswers]
+  );
+
   const form = useForm<z.infer<typeof LetterAnswerSchema>>({
     resolver: zodResolver(LetterAnswerSchema),
-    defaultValues: {
-      letterAnswers: [{ id: '', correctLetter: '' }]
-    }
+    values: defaultValues // Use the actual data, not hardcoded values
   });
 
-  useEffect(() => {
-    if (letterAnswers.length > 0) {
-      form.setValue(
-        'letterAnswers',
-        letterAnswers.map((letterAnswer) => ({
-          id: letterAnswer.id,
-          correctLetter: letterAnswer.correctLetter
-        }))
-      );
-    }
-  }, [form, letterAnswers]);
+  // Form is initialized with reactive values that update when letterAnswers change
 
-  if (!questionGroup || !isModalOpen) {
+  // Don't render until we have actual data
+  if (!questionGroup || !isModalOpen || letterAnswers.length === 0) {
     return null;
   }
 
@@ -87,12 +104,17 @@ export function LetterAnswerUpdateForm() {
         <div className="px-6 pt-6">
           <h2 className="text-xl font-bold mb-4">Update Letter Answers</h2>
           <p className="text-sm text-muted-foreground mb-6">
-            Update the titles and correct letters for each answer.
+            Select the correct answers from the available options for each
+            question.
           </p>
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="px-6 pb-6">
+          <form
+            key={questionGroup?.id}
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="px-6 pb-6"
+          >
             <div className="space-y-4">
               {letterAnswers.map((letterAnswer, index) => (
                 <div key={letterAnswer.id} className="border rounded-lg p-4">
@@ -102,26 +124,36 @@ export function LetterAnswerUpdateForm() {
 
                   <div className="space-y-3">
                     <FormField
+                      key={`${letterAnswer.id}-${letterAnswer.correctLetter}`}
                       control={form.control}
                       name={`letterAnswers.${index}.correctLetter`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Correct Letter</FormLabel>
+                          <FormLabel>Correct Answer</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="A"
-                              maxLength={1}
-                              className="w-20"
-                              {...field}
-                              onChange={(e) => {
-                                const value = e.target.value.toUpperCase();
-                                if (/^[A-Z]?$/.test(value)) {
-                                  field.onChange(value);
-                                }
-                              }}
-                            />
+                            <Select
+                              value={field.value ?? letterAnswer.correctLetter}
+                              onValueChange={field.onChange}
+                              disabled={isPending}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select correct answer" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {availableOptions.map((option) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </FormControl>
                           <FormMessage />
+                          <p className="text-xs text-muted-foreground">
+                            DB: &quot;{letterAnswer.correctLetter}&quot; | Form:
+                            &quot;{field.value}&quot; | Options:{' '}
+                            {availableOptions.join(', ')}
+                          </p>
                         </FormItem>
                       )}
                     />

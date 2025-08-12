@@ -7,7 +7,8 @@ export const ParamsAssessmentPageSchema = z.object({
     .literal('edit')
     .or(z.literal('exam'))
     .or(z.literal('practice'))
-    .optional()
+    .optional(),
+  currentTab: z.string().optional()
 });
 
 export const ParamsScorePageSchema = z.object({

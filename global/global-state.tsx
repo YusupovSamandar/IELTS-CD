@@ -1,6 +1,7 @@
 'use client';
 
 import { FC, RefObject, createRef, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { AssessmentExtended, PartExtended } from '@/types/test-exam';
 import { ModeType } from '@/lib/validations/params';
 import { EditContext, EditData, EditType } from './edit-context';
@@ -12,6 +13,7 @@ interface GlobalStateProps {
 }
 
 export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<string>('');
   const [selectedPart, setSelectedPart] = useState<PartExtended | null>(null);
   const [selectedAssessment, setSelectedAssessment] =
@@ -52,10 +54,34 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       )
     );
 
-    // Always set the first part as active tab and selected part
-    setActiveTab(selectedAssessment.parts[0].id);
-    setSelectedPart(selectedAssessment.parts[0]);
-  }, [selectedAssessment, mode]);
+    // Only set the first part as active tab if no activeTab is already set
+    if (!activeTab) {
+      setActiveTab(selectedAssessment.parts[0].id);
+      setSelectedPart(selectedAssessment.parts[0]);
+    }
+  }, [selectedAssessment, mode, activeTab]);
+
+  // Separate effect for handling URL parameters
+  useEffect(() => {
+    if (!selectedAssessment) return;
+
+    const urlCurrentTab = searchParams.get('currentTab');
+    if (urlCurrentTab && urlCurrentTab !== activeTab) {
+      // Validate that the URL tab exists in the assessment
+      const tabExists = selectedAssessment.parts.some(
+        (part) => part.id === urlCurrentTab
+      );
+      if (tabExists) {
+        setActiveTab(urlCurrentTab);
+        const selectedPartFromUrl = selectedAssessment.parts.find(
+          (part) => part.id === urlCurrentTab
+        );
+        if (selectedPartFromUrl) {
+          setSelectedPart(selectedPartFromUrl);
+        }
+      }
+    }
+  }, [searchParams, selectedAssessment, activeTab]);
   useEffect(() => {
     // Only start the timer if we have time remaining and assessment is selected
     if (!selectedAssessment || timeRemaining <= 0) return;

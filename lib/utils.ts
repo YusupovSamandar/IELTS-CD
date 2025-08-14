@@ -86,7 +86,7 @@ export const createUrl = (
 
 export function createUrlWithCurrentTab(
   pathname: string,
-  params: URLSearchParams | ReadonlyURLSearchParams,
+  params: URLSearchParams,
   currentTab?: string
 ): string {
   const newParams = new URLSearchParams(params);

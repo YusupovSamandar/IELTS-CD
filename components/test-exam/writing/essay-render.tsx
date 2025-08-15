@@ -105,7 +105,7 @@ const WritingEssayRender = ({
             {essayPart.description}
           </p>
           <p className="text-sm font-medium mb-4">
-            Maximum words: {essayPart.maxWords}
+            Minimum words: {essayPart.maxWords}
           </p>
 
           {/* Image upload for Task 1 only */}
@@ -180,7 +180,7 @@ const WritingEssayRender = ({
             {essayPart.description}
           </p>
           <p className="text-sm font-medium">
-            Write approximately {essayPart.maxWords} words.
+            Write at least {essayPart.maxWords} words.
           </p>
         </div>
 
@@ -220,7 +220,7 @@ const WritingEssayRender = ({
                 wordCount > essayPart.maxWords ? 'text-destructive' : ''
               }
             >
-              Recommended: {essayPart.maxWords} words
+              Minimum: {essayPart.maxWords} words
             </span>
           </div>
         </div>

@@ -146,7 +146,7 @@ export function EssayPartUpdateForm() {
               name="maxWords"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Maximum Words</FormLabel>
+                  <FormLabel>Minimum Words</FormLabel>
                   <FormControl>
                     <Input
                       type="number"

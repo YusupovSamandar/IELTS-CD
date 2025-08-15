@@ -54,8 +54,13 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       )
     );
 
-    // Only set the first part as active tab if no activeTab is already set
-    if (!activeTab) {
+    // Check if current activeTab is valid for this assessment
+    const isActiveTabValid =
+      activeTab &&
+      selectedAssessment.parts.some((part) => part.id === activeTab);
+
+    // Only set the first part as active tab if no valid activeTab is set
+    if (!isActiveTabValid) {
       setActiveTab(selectedAssessment.parts[0].id);
       setSelectedPart(selectedAssessment.parts[0]);
     }
@@ -67,7 +72,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
     const urlCurrentTab = searchParams.get('currentTab');
     if (urlCurrentTab && urlCurrentTab !== activeTab) {
-      // Validate that the URL tab exists in the assessment
+      // Validate that the URL tab exists in the current assessment
       const tabExists = selectedAssessment.parts.some(
         (part) => part.id === urlCurrentTab
       );
@@ -79,6 +84,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         if (selectedPartFromUrl) {
           setSelectedPart(selectedPartFromUrl);
         }
+      } else {
+        // If URL tab doesn't exist in current assessment, clear it from URL and use default
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.delete('currentTab');
+        window.history.replaceState({}, '', currentUrl.toString());
       }
     }
   }, [searchParams, selectedAssessment, activeTab]);

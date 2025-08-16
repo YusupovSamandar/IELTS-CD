@@ -229,7 +229,7 @@ const WritingEssayRender = ({
           <Textarea
             value={value}
             onChange={handleTextChange}
-            placeholder={`Start writing your ${essayPart.title.toLowerCase()}...`}
+            placeholder={`Type here`}
             className="h-full resize-none font-mono leading-relaxed text-base border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             spellCheck={false}
             autoComplete="off"

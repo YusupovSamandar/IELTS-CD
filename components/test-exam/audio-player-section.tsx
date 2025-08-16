@@ -29,21 +29,23 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isUploading, setIsUploading] = useState(false);
-  const [isSeeking, setIsSeeking] = useState(false); // <-- 1. Add seeking state
 
   const isEditMode = mode === 'edit';
 
   const handleTimeUpdate = useCallback(() => {
-    if (audioRef.current && !isSeeking) {
+    if (audioRef.current) {
       console.log('Time update:', audioRef.current.currentTime);
       setCurrentTime(audioRef.current.currentTime);
     }
-  }, [isSeeking]);
+  }, []);
 
   useEffect(() => {
+    // Reset when audio path changes
+    setCurrentTime(0);
+    setIsPlaying(false);
+    
     if (!isEditMode && assessment.audioPath && audioRef.current) {
       const playAudio = async () => {
         try {
@@ -56,6 +58,29 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
       playAudio();
     }
   }, [isEditMode, assessment.audioPath]);
+
+  // Additional useEffect to ensure duration is loaded
+  useEffect(() => {
+    if (assessment.audioPath && audioRef.current) {
+      const checkDuration = () => {
+        if (audioRef.current && audioRef.current.duration) {
+          const audioDuration = audioRef.current.duration;
+          if (Number.isFinite(audioDuration) && audioDuration > 0) {
+            console.log('Duration found via useEffect:', audioDuration);
+            // Duration no longer needed since we removed the display
+          }
+        }
+      };
+
+      // Check immediately
+      checkDuration();
+
+      // Also check after a short delay in case metadata isn't loaded yet
+      const timeoutId = setTimeout(checkDuration, 500);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [assessment.audioPath]);
 
   if (!assessment.audioPath && !isEditMode) {
     return null;
@@ -81,55 +106,30 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
       const audioDuration = audioRef.current.duration;
-      console.log(
-        'Audio metadata loaded, duration:',
-        audioDuration,
-        'readyState:',
-        audioRef.current.readyState
-      );
+      console.log('Audio metadata loaded, duration:', audioDuration);
       if (Number.isFinite(audioDuration) && audioDuration > 0) {
-        setDuration(audioDuration);
+        console.log('Duration found:', audioDuration);
       }
     }
   };
 
-  const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentTime(parseFloat(e.target.value));
+  const handleLoadedData = () => {
+    if (audioRef.current) {
+      const audioDuration = audioRef.current.duration;
+      console.log('Audio data loaded, duration:', audioDuration);
+      if (Number.isFinite(audioDuration) && audioDuration > 0) {
+        console.log('Duration found:', audioDuration);
+      }
+    }
   };
 
-  const handleSeekEnd = () => {
+  const handleDurationChange = () => {
     if (audioRef.current) {
-      const targetTime = currentTime;
-      console.log('Seeking to:', targetTime);
-
-      const performSeek = () => {
-        if (audioRef.current) {
-          // Check if the audio is ready for seeking
-          if (
-            audioRef.current.readyState >= 2 &&
-            audioRef.current.duration > 0
-          ) {
-            // Clamp the target time to valid range
-            const clampedTime = Math.max(
-              0,
-              Math.min(targetTime, audioRef.current.duration)
-            );
-            audioRef.current.currentTime = clampedTime;
-            console.log(
-              'Seek completed, actual time:',
-              audioRef.current.currentTime
-            );
-            setCurrentTime(clampedTime);
-            setIsSeeking(false);
-          } else {
-            console.log('Audio not ready for seeking, retrying...');
-            // Audio not ready, wait a bit and try again
-            setTimeout(performSeek, 50);
-          }
-        }
-      };
-
-      performSeek();
+      const audioDuration = audioRef.current.duration;
+      console.log('Duration changed, new duration:', audioDuration);
+      if (Number.isFinite(audioDuration) && audioDuration > 0) {
+        console.log('Duration found:', audioDuration);
+      }
     }
   };
 
@@ -193,6 +193,8 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
           src={assessment.audioPath}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
+          onLoadedData={handleLoadedData}
+          onDurationChange={handleDurationChange}
           onCanPlay={handleCanPlay}
           onEnded={() => setIsPlaying(false)}
           preload="metadata"
@@ -261,23 +263,6 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
                 <div className="flex-1 flex items-center space-x-2">
                   <span className="text-sm text-muted-foreground">
                     {formatTime(currentTime)}
-                  </span>
-                  {/* 3. Add mouse events to the slider */}
-                  <input
-                    type="range"
-                    min="0"
-                    max={duration || 0}
-                    step="0.1"
-                    value={currentTime}
-                    onChange={handleSeekChange}
-                    onMouseDown={() => setIsSeeking(true)}
-                    onMouseUp={handleSeekEnd}
-                    onTouchStart={() => setIsSeeking(true)}
-                    onTouchEnd={handleSeekEnd}
-                    className="flex-1 h-2 bg-secondary rounded-lg appearance-none cursor-pointer"
-                  />
-                  <span className="text-sm text-muted-foreground">
-                    {formatTime(duration)}
                   </span>
                 </div>
 

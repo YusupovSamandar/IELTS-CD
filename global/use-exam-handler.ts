@@ -134,7 +134,7 @@ export const useExamHandler = () => {
           break;
 
         case 'COMPLETION':
-          if (question.correctAnswer === userAnswer.content) {
+          if (question.correctAnswer?.trim() === userAnswer.content?.trim()) {
             totalCorrectAnswers++;
           }
           break;

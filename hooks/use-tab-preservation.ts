@@ -18,7 +18,9 @@ export function useTabPreservation() {
 
     // Preserve existing params like mode
     const newUrl = `${window.location.pathname}?${newSearchParams.toString()}`;
-    router.replace(newUrl, { scroll: false });
+
+    // Use replaceState directly to avoid triggering router events
+    window.history.replaceState({}, '', newUrl);
   };
 
   const preserveCurrentTab = () => {

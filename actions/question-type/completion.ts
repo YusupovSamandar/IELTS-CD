@@ -111,7 +111,7 @@ export const updateCompletionAnswers = async ({
         updateMany: questions.map((question, i) => ({
           where: { id: completion.questions[i].id },
           data: {
-            correctAnswer: question.correctAnswer
+            correctAnswer: question.correctAnswer.trim()
           }
         }))
       }

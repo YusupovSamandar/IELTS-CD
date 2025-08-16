@@ -49,8 +49,17 @@ export function CompletionAnswerUpdateForm() {
   const onSubmit = (values: z.infer<typeof CompletionAnswerSchema>) => {
     startTransition(async () => {
       try {
+        // Trim all answers before submitting
+        const trimmedValues = {
+          ...values,
+          questions: values.questions.map((q) => ({
+            ...q,
+            correctAnswer: q.correctAnswer.trim()
+          }))
+        };
+
         await updateCompletionAnswers({
-          formData: values,
+          formData: trimmedValues,
           id: completion.id
         });
         toast.success('Updated');

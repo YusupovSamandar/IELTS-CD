@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, RefObject, createRef, useEffect, useState } from 'react';
+import { FC, RefObject, createRef, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AssessmentExtended, PartExtended } from '@/types/test-exam';
 import { ModeType } from '@/lib/validations/params';
@@ -14,6 +14,7 @@ interface GlobalStateProps {
 
 export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const searchParams = useSearchParams();
+  const hasInitializedFromUrl = useRef(false);
   const [activeTab, setActiveTab] = useState<string>('');
   const [selectedPart, setSelectedPart] = useState<PartExtended | null>(null);
   const [selectedAssessment, setSelectedAssessment] =
@@ -53,6 +54,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         createRef<HTMLDivElement>()
       )
     );
+  }, [selectedAssessment, mode]); // Remove activeTab from dependencies
+
+  // Separate effect for tab initialization
+  useEffect(() => {
+    if (!selectedAssessment) return;
 
     // Check if current activeTab is valid for this assessment
     const isActiveTabValid =
@@ -64,19 +70,19 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       setActiveTab(selectedAssessment.parts[0].id);
       setSelectedPart(selectedAssessment.parts[0]);
     }
-  }, [selectedAssessment, mode, activeTab]);
+  }, [selectedAssessment, activeTab]);
 
-  // Separate effect for handling URL parameters
+  // Separate effect for handling URL parameters - only run once when assessment loads
   useEffect(() => {
-    if (!selectedAssessment) return;
+    if (!selectedAssessment || hasInitializedFromUrl.current) return;
 
     const urlCurrentTab = searchParams.get('currentTab');
-    if (urlCurrentTab && urlCurrentTab !== activeTab) {
+    if (urlCurrentTab) {
       // Validate that the URL tab exists in the current assessment
       const tabExists = selectedAssessment.parts.some(
         (part) => part.id === urlCurrentTab
       );
-      if (tabExists) {
+      if (tabExists && urlCurrentTab !== activeTab) {
         setActiveTab(urlCurrentTab);
         const selectedPartFromUrl = selectedAssessment.parts.find(
           (part) => part.id === urlCurrentTab
@@ -84,14 +90,21 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         if (selectedPartFromUrl) {
           setSelectedPart(selectedPartFromUrl);
         }
-      } else {
+      } else if (!tabExists) {
         // If URL tab doesn't exist in current assessment, clear it from URL and use default
         const currentUrl = new URL(window.location.href);
         currentUrl.searchParams.delete('currentTab');
         window.history.replaceState({}, '', currentUrl.toString());
       }
     }
-  }, [searchParams, selectedAssessment, activeTab]);
+
+    hasInitializedFromUrl.current = true;
+  }, [selectedAssessment, searchParams, activeTab]);
+
+  // Reset the initialization flag when assessment changes
+  useEffect(() => {
+    hasInitializedFromUrl.current = false;
+  }, [selectedAssessment?.id]);
   useEffect(() => {
     // Only start the timer if we have time remaining and assessment is selected
     if (!selectedAssessment || timeRemaining <= 0) return;

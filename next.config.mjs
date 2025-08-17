@@ -1,6 +1,12 @@
+import withPWA from 'next-pwa';
 import { fileURLToPath } from 'url';
 
 /** @type {import('next').NextConfig} */
+
+const pwa = withPWA({
+  dest: 'public'
+});
+
 const nextConfig = {
   // Optimize for faster local startup
   experimental: {
@@ -36,4 +42,4 @@ const nextConfig = {
   }
 };
 
-export default nextConfig;
+export default pwa(nextConfig);

@@ -17,9 +17,13 @@ export const logout = async (redirectTo: string = '/auth/login') => {
 
     // Sign out using NextAuth - this will handle cookie cleanup properly
     await nextAuthSignOut({
-      callbackUrl: redirectTo,
-      redirect: true
+      redirect: false
     });
+
+    // Client-side redirect to preserve current host
+    if (typeof window !== 'undefined') {
+      window.location.href = redirectTo;
+    }
   } catch (error) {
     console.error('Logout error:', error);
 

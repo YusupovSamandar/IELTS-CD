@@ -40,6 +40,23 @@ export const {
     }
   },
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      // Get the current host from the request headers or use baseUrl
+      const currentHost = baseUrl;
+
+      // If url is relative, use current host
+      if (url.startsWith('/')) {
+        return `${currentHost}${url}`;
+      }
+
+      // If url is same origin as current host, allow it
+      if (url.startsWith(currentHost)) {
+        return url;
+      }
+
+      // For external URLs, redirect to current host root
+      return currentHost;
+    },
     async signIn({ user, account }) {
       // Allow OAuth without email verification
       if (account?.provider !== 'credentials') return true;

@@ -16,9 +16,11 @@ export const LogoutButton = ({ children }: LogoutButtonProps) => {
       }
 
       await signOut({
-        callbackUrl: '/auth/login',
-        redirect: true
+        redirect: false
       });
+
+      // Client-side redirect to preserve current host
+      window.location.href = '/auth/login';
     } catch (error) {
       console.error('Logout error:', error);
       // Fallback to direct navigation

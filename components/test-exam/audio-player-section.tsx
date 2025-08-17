@@ -45,7 +45,7 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
     // Reset when audio path changes
     setCurrentTime(0);
     setIsPlaying(false);
-    
+
     if (!isEditMode && assessment.audioPath && audioRef.current) {
       const playAudio = async () => {
         try {
@@ -77,7 +77,7 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({
 
       // Also check after a short delay in case metadata isn't loaded yet
       const timeoutId = setTimeout(checkDuration, 500);
-      
+
       return () => clearTimeout(timeoutId);
     }
   }, [assessment.audioPath]);

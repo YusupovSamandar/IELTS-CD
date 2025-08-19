@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext } from 'react';
+import { memo, useContext } from 'react';
 import { SectionType } from '@prisma/client';
 import { ExamContext } from '@/global/exam-context';
 import { CompletionRender } from '@/components/question-type/completion';
@@ -18,9 +18,100 @@ import {
 } from '@/components/ui/resizable';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { PassageRender } from '../../passage/passage-render';
+import { PassageRenderWithHighlight } from '../../passage/passage-render-with-highlight';
 import WritingBodyContentRender from '../../writing/body-content-render';
 
-const PartBodyContentRender = () => {
+// Memoized component for question groups to prevent timer-related rerenders
+const QuestionGroupsSection = memo(
+  ({ selectedPart }: { selectedPart: any }) => {
+    return (
+      <div className="pb-16">
+        <div className="flex justify-end">
+          <ActionButton
+            actionType="create"
+            editType="createQuestionGroup"
+            data={{ part: selectedPart }}
+          >
+            <div className={buttonVariants()}>New Question Group</div>
+          </ActionButton>
+        </div>
+
+        {selectedPart.questionGroups &&
+        selectedPart.questionGroups.length > 0 ? (
+          selectedPart.questionGroups.map((questionGroup: any) => {
+            return (
+              <div key={questionGroup.id} className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-bold">
+                      Questions {questionGroup.startQuestionNumber}-
+                      {questionGroup.endQuestionNumber}
+                    </p>
+                    <p className=" whitespace-pre-line">
+                      {questionGroup.title}
+                    </p>
+                  </div>
+                  <div>
+                    <ActionButton
+                      actionType="update"
+                      editType="editQuestionGroup"
+                      data={{ questionGroup }}
+                    />
+                    <ActionButton
+                      actionType="delete"
+                      editType="deleteQuestionGroup"
+                      data={{ questionGroup }}
+                    />
+                  </div>
+                </div>
+
+                {questionGroup.type === 'MULTIPLE_CHOICE_ONE_ANSWER' &&
+                  questionGroup.multiOneList.map((multiOne: any) => (
+                    <MultiOneRender multiOne={multiOne} key={multiOne.id} />
+                  ))}
+                {questionGroup.type === 'MULTIPLE_CHOICE_MORE_ANSWERS' &&
+                  questionGroup.multiMoreList.map((multiMore: any) => (
+                    <MultiMoreRender multiMore={multiMore} key={multiMore.id} />
+                  ))}
+                {questionGroup.type === 'IDENTIFYING_INFORMATION' &&
+                  questionGroup.identifyInfoList.map((identifyInfo: any) => (
+                    <IdentifyInfoRender
+                      identifyInfo={identifyInfo}
+                      key={identifyInfo.id}
+                    />
+                  ))}
+                {questionGroup.type === 'YES_NO_NOT_GIVEN' &&
+                  questionGroup.yesNoNotGivenList.map((yesNoNotGiven: any) => (
+                    <YesNoNotGivenRender
+                      yesNoNotGiven={yesNoNotGiven}
+                      key={yesNoNotGiven.id}
+                    />
+                  ))}
+                {(questionGroup.type === 'COMPLETION' ||
+                  questionGroup.type === 'TABLE_COMPLETION') && (
+                  <CompletionRender questionGroup={questionGroup} />
+                )}
+                {questionGroup.type === 'LETTER_ANSWER' && (
+                  <LetterAnswerRender questionGroup={questionGroup} />
+                )}
+              </div>
+            );
+          })
+        ) : (
+          <div className="p-4 text-center text-muted-foreground">
+            No question groups yet. Click &quot;New Question Group&quot; to
+            create one.
+          </div>
+        )}
+      </div>
+    );
+  }
+);
+
+QuestionGroupsSection.displayName = 'QuestionGroupsSection';
+
+const PartBodyContentRender = memo(() => {
+  // Only extract the values we actually need to prevent timer rerenders
   const { selectedPart, selectedAssessment } = useContext(ExamContext);
 
   if (!selectedPart) {
@@ -41,88 +132,7 @@ const PartBodyContentRender = () => {
           type="always"
           className="w-full h-full overflow-auto pl-4 pr-8"
         >
-          <div className="pb-16">
-            <div className="flex justify-end mb-4">
-              <ActionButton
-                actionType="create"
-                editType="createQuestionGroup"
-                data={{ part: selectedPart }}
-              >
-                <div className={buttonVariants()}>New Question Group</div>
-              </ActionButton>
-            </div>
-
-            {selectedPart.questionGroups &&
-            selectedPart.questionGroups.length > 0 ? (
-              selectedPart.questionGroups.map((questionGroup) => {
-                return (
-                  <div key={questionGroup.id} className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-bold">
-                          Questions {questionGroup.startQuestionNumber}-
-                          {questionGroup.endQuestionNumber}
-                        </p>
-                        <p className=" whitespace-pre-line">
-                          {questionGroup.title}
-                        </p>
-                      </div>
-                      <div>
-                        <ActionButton
-                          actionType="update"
-                          editType="editQuestionGroup"
-                          data={{ questionGroup }}
-                        />
-                        <ActionButton
-                          actionType="delete"
-                          editType="deleteQuestionGroup"
-                          data={{ questionGroup }}
-                        />
-                      </div>
-                    </div>
-
-                    {questionGroup.type === 'MULTIPLE_CHOICE_ONE_ANSWER' &&
-                      questionGroup.multiOneList.map((multiOne) => (
-                        <MultiOneRender multiOne={multiOne} key={multiOne.id} />
-                      ))}
-                    {questionGroup.type === 'MULTIPLE_CHOICE_MORE_ANSWERS' &&
-                      questionGroup.multiMoreList.map((multiMore) => (
-                        <MultiMoreRender
-                          multiMore={multiMore}
-                          key={multiMore.id}
-                        />
-                      ))}
-                    {questionGroup.type === 'IDENTIFYING_INFORMATION' &&
-                      questionGroup.identifyInfoList.map((identifyInfo) => (
-                        <IdentifyInfoRender
-                          identifyInfo={identifyInfo}
-                          key={identifyInfo.id}
-                        />
-                      ))}
-                    {questionGroup.type === 'YES_NO_NOT_GIVEN' &&
-                      questionGroup.yesNoNotGivenList.map((yesNoNotGiven) => (
-                        <YesNoNotGivenRender
-                          yesNoNotGiven={yesNoNotGiven}
-                          key={yesNoNotGiven.id}
-                        />
-                      ))}
-                    {(questionGroup.type === 'COMPLETION' ||
-                      questionGroup.type === 'TABLE_COMPLETION') && (
-                      <CompletionRender questionGroup={questionGroup} />
-                    )}
-                    {questionGroup.type === 'LETTER_ANSWER' && (
-                      <LetterAnswerRender questionGroup={questionGroup} />
-                    )}
-                  </div>
-                );
-              })
-            ) : (
-              <div className="p-4 text-center text-muted-foreground">
-                No question groups yet. Click &quot;New Question Group&quot; to
-                create one.
-              </div>
-            )}
-          </div>
+          <QuestionGroupsSection selectedPart={selectedPart} />
           <ScrollBar className="w-4" />
         </ScrollArea>
       </div>
@@ -137,7 +147,7 @@ const PartBodyContentRender = () => {
           <ScrollArea type="always" className="w-full h-full pl-4 pr-8">
             <div className="pb-16">
               {selectedPart.passage ? (
-                <PassageRender passage={selectedPart.passage} />
+                <PassageRenderWithHighlight passage={selectedPart.passage} />
               ) : (
                 <ActionButton
                   actionType="create"
@@ -155,97 +165,16 @@ const PartBodyContentRender = () => {
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={50} className="min-h-0">
           <ScrollArea type="always" className="w-full h-full pl-4 pr-8">
-            <div className="pb-16">
-              <div className="flex justify-end">
-                <ActionButton
-                  actionType="create"
-                  editType="createQuestionGroup"
-                  data={{ part: selectedPart }}
-                >
-                  <div className={buttonVariants()}>New Question Group</div>
-                </ActionButton>
-              </div>
-
-              {selectedPart.questionGroups &&
-              selectedPart.questionGroups.length > 0 ? (
-                selectedPart.questionGroups.map((questionGroup) => {
-                  return (
-                    <div key={questionGroup.id} className="flex flex-col gap-2">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-bold">
-                            Questions {questionGroup.startQuestionNumber}-
-                            {questionGroup.endQuestionNumber}
-                          </p>
-                          <p className=" whitespace-pre-line">
-                            {questionGroup.title}
-                          </p>
-                        </div>
-                        <div>
-                          <ActionButton
-                            actionType="update"
-                            editType="editQuestionGroup"
-                            data={{ questionGroup }}
-                          />
-                          <ActionButton
-                            actionType="delete"
-                            editType="deleteQuestionGroup"
-                            data={{ questionGroup }}
-                          />
-                        </div>
-                      </div>
-
-                      {questionGroup.type === 'MULTIPLE_CHOICE_ONE_ANSWER' &&
-                        questionGroup.multiOneList.map((multiOne) => (
-                          <MultiOneRender
-                            multiOne={multiOne}
-                            key={multiOne.id}
-                          />
-                        ))}
-                      {questionGroup.type === 'MULTIPLE_CHOICE_MORE_ANSWERS' &&
-                        questionGroup.multiMoreList.map((multiMore) => (
-                          <MultiMoreRender
-                            multiMore={multiMore}
-                            key={multiMore.id}
-                          />
-                        ))}
-                      {questionGroup.type === 'IDENTIFYING_INFORMATION' &&
-                        questionGroup.identifyInfoList.map((identifyInfo) => (
-                          <IdentifyInfoRender
-                            identifyInfo={identifyInfo}
-                            key={identifyInfo.id}
-                          />
-                        ))}
-                      {questionGroup.type === 'YES_NO_NOT_GIVEN' &&
-                        questionGroup.yesNoNotGivenList.map((yesNoNotGiven) => (
-                          <YesNoNotGivenRender
-                            yesNoNotGiven={yesNoNotGiven}
-                            key={yesNoNotGiven.id}
-                          />
-                        ))}
-                      {(questionGroup.type === 'COMPLETION' ||
-                        questionGroup.type === 'TABLE_COMPLETION') && (
-                        <CompletionRender questionGroup={questionGroup} />
-                      )}
-                      {questionGroup.type === 'LETTER_ANSWER' && (
-                        <LetterAnswerRender questionGroup={questionGroup} />
-                      )}
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="p-4 text-center text-muted-foreground">
-                  No question groups yet. Click &quot;New Question Group&quot;
-                  to create one.
-                </div>
-              )}
-            </div>
+            <QuestionGroupsSection selectedPart={selectedPart} />
             <ScrollBar className="w-4" />
           </ScrollArea>
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
   );
-};
+});
+
+// Add display name for better debugging
+PartBodyContentRender.displayName = 'PartBodyContentRender';
 
 export default PartBodyContentRender;

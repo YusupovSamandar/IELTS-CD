@@ -13,6 +13,7 @@ import {
 import { CompletionExtended } from '@/types/test-exam';
 import { ElementRender } from '@/components/common/text-editor/element-render';
 import { LeafRender } from '@/components/common/text-editor/leaf-render/leaf-render';
+import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 
 const CompletionParagraphRender = ({
   completion
@@ -31,17 +32,22 @@ const CompletionParagraphRender = ({
   );
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   return (
-    <Slate
-      key={completion.paragraph}
-      editor={editor}
-      initialValue={JSON.parse(completion.paragraph)}
+    <HighlightableWrapper 
+      elementId={`completion-${completion.id}`}
+      className="slate-editor-wrapper"
     >
-      <Editable
-        renderElement={renderElement}
-        renderLeaf={renderLeaf}
-        readOnly
-      />
-    </Slate>
+      <Slate
+        key={completion.paragraph}
+        editor={editor}
+        initialValue={JSON.parse(completion.paragraph)}
+      >
+        <Editable
+          renderElement={renderElement}
+          renderLeaf={renderLeaf}
+          readOnly
+        />
+      </Slate>
+    </HighlightableWrapper>
   );
 };
 

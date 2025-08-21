@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { ActionButton } from '@/components/test-exam/action-button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 
 export const MultiMoreRender = ({
   multiMore
@@ -71,7 +72,11 @@ export const MultiMoreRender = ({
         >
           {multiMore.question.questionNumber}
         </p>
-        <p>{multiMore.title}</p>
+        <HighlightableWrapper 
+          elementId={`question-${multiMore.question.id}-title`}
+        >
+          {multiMore.title}
+        </HighlightableWrapper>
         <p className="text-sm text-muted-foreground">
           Select exactly 2 answers ({choiceIdList.length}/2 selected)
         </p>
@@ -95,7 +100,11 @@ export const MultiMoreRender = ({
                 id={choice.id}
               />
               <Label htmlFor={choice.id} className="py-4 w-full cursor-pointer">
-                {choice.content}
+                <HighlightableWrapper 
+                  elementId={`choice-${choice.id}-content`}
+                >
+                  {choice.content}
+                </HighlightableWrapper>
               </Label>
               <ActionButton
                 actionType="update"

@@ -13,6 +13,7 @@ import {
 import { LetterAnswerExtended } from '@/types/test-exam';
 import { ElementRender } from '@/components/common/text-editor/element-render';
 import { LeafRender } from '@/components/common/text-editor/leaf-render/leaf-render';
+import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 
 const LetterAnswerParagraphRender = ({
   letterAnswer
@@ -41,17 +42,22 @@ const LetterAnswerParagraphRender = ({
   }
 
   return (
-    <Slate
-      key={letterAnswer.paragraph}
-      editor={editor}
-      initialValue={JSON.parse(letterAnswer.paragraph)}
+    <HighlightableWrapper 
+      elementId={`letter-answer-${letterAnswer.id}`}
+      className="slate-editor-wrapper"
     >
-      <Editable
-        renderElement={renderElement}
-        renderLeaf={renderLeaf}
-        readOnly
-      />
-    </Slate>
+      <Slate
+        key={letterAnswer.paragraph}
+        editor={editor}
+        initialValue={JSON.parse(letterAnswer.paragraph)}
+      >
+        <Editable
+          renderElement={renderElement}
+          renderLeaf={renderLeaf}
+          readOnly
+        />
+      </Slate>
+    </HighlightableWrapper>
   );
 };
 

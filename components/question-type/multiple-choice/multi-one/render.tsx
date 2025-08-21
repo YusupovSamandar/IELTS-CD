@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { ActionButton } from '@/components/test-exam/action-button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 
 export const MultiOneRender = ({
   multiOne
@@ -39,7 +40,11 @@ export const MultiOneRender = ({
         >
           {multiOne.question.questionNumber}
         </p>
-        <p>{multiOne.title}</p>
+        <HighlightableWrapper 
+          elementId={`question-${multiOne.question.id}-title`}
+        >
+          {multiOne.title}
+        </HighlightableWrapper>
         <ActionButton
           actionType="update"
           editType="editMultiOne"
@@ -79,7 +84,11 @@ export const MultiOneRender = ({
                   htmlFor={choice.id}
                   className="py-4 w-full cursor-pointer"
                 >
-                  {choice.content}
+                  <HighlightableWrapper 
+                    elementId={`choice-${choice.id}-content`}
+                  >
+                    {choice.content}
+                  </HighlightableWrapper>
                 </Label>
                 <ActionButton
                   actionType="update"

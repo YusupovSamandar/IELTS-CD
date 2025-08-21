@@ -7,6 +7,7 @@ import { ModeType } from '@/lib/validations/params';
 import { EditContext, EditData, EditType } from './edit-context';
 import { AnswerType, ExamContext } from './exam-context';
 import { UserProvider } from './user-context';
+import { HighlightProvider } from './highlight-context';
 
 interface GlobalStateProps {
   children: React.ReactNode;
@@ -161,7 +162,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   return (
     <UserProvider>
-      <ExamContext.Provider
+      <HighlightProvider>
+        <ExamContext.Provider
         value={{
           activeTab,
           selectedAssessment,
@@ -206,6 +208,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
           {children}
         </EditContext.Provider>
       </ExamContext.Provider>
+      </HighlightProvider>
     </UserProvider>
   );
 };

@@ -11,6 +11,7 @@ import { MultiOneRender } from '@/components/question-type/multiple-choice/multi
 import { YesNoNotGivenRender } from '@/components/question-type/yes-no-not-given/render';
 import { ActionButton } from '@/components/test-exam/action-button';
 import { buttonVariants } from '@/components/ui/button';
+import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 import {
   ResizableHandle,
   ResizablePanel,
@@ -47,9 +48,12 @@ const QuestionGroupsSection = memo(
                       Questions {questionGroup.startQuestionNumber}-
                       {questionGroup.endQuestionNumber}
                     </p>
-                    <p className=" whitespace-pre-line">
+                    <HighlightableWrapper 
+                      elementId={`question-group-title-${questionGroup.id}`}
+                      className="whitespace-pre-line"
+                    >
                       {questionGroup.title}
-                    </p>
+                    </HighlightableWrapper>
                   </div>
                   <div>
                     <ActionButton

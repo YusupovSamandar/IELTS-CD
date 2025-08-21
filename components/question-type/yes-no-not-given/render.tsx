@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { ActionButton } from '@/components/test-exam/action-button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 
 export const YesNoNotGivenRender = ({
   yesNoNotGiven
@@ -58,7 +59,11 @@ export const YesNoNotGivenRender = ({
         >
           {yesNoNotGiven.question.questionNumber}
         </p>
-        <p>{yesNoNotGiven.title}</p>
+        <HighlightableWrapper 
+          elementId={`question-${yesNoNotGiven.question.id}-title`}
+        >
+          {yesNoNotGiven.title}
+        </HighlightableWrapper>
         <ActionButton
           actionType="update"
           editType="editYesNoNotGiven"

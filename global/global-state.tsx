@@ -6,8 +6,8 @@ import { AssessmentExtended, PartExtended } from '@/types/test-exam';
 import { ModeType } from '@/lib/validations/params';
 import { EditContext, EditData, EditType } from './edit-context';
 import { AnswerType, ExamContext } from './exam-context';
-import { UserProvider } from './user-context';
 import { HighlightProvider } from './highlight-context';
+import { UserProvider } from './user-context';
 
 interface GlobalStateProps {
   children: React.ReactNode;
@@ -164,50 +164,50 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     <UserProvider>
       <HighlightProvider>
         <ExamContext.Provider
-        value={{
-          activeTab,
-          selectedAssessment,
-          questionRefs,
-          userAnswers,
-          currentRef,
-          listHeading,
-          selectedPart,
-          timeRemaining,
-          mode,
-          isSubmit,
-          submitProgress,
-          setIsSubmit,
-          setSubmitProgress,
-          setMode,
-          setTimeRemaining,
-          setSelectedPart,
-          setListHeading,
-          setUserAnswers,
-          essayValues,
-          setEssayValues,
-          setCurrentRef,
-          setQuestionRefs,
-          setSelectedAssessment,
-          setActiveTab,
-          triggerAutoSubmit,
-          setTriggerAutoSubmit
-        }}
-      >
-        <EditContext.Provider
           value={{
-            isOpen,
-            textNoteCompletion,
-            setTextNoteCompletion,
-            setData,
-            setIsOpen,
-            setType,
-            type,
-            data
+            activeTab,
+            selectedAssessment,
+            questionRefs,
+            userAnswers,
+            currentRef,
+            listHeading,
+            selectedPart,
+            timeRemaining,
+            mode,
+            isSubmit,
+            submitProgress,
+            setIsSubmit,
+            setSubmitProgress,
+            setMode,
+            setTimeRemaining,
+            setSelectedPart,
+            setListHeading,
+            setUserAnswers,
+            essayValues,
+            setEssayValues,
+            setCurrentRef,
+            setQuestionRefs,
+            setSelectedAssessment,
+            setActiveTab,
+            triggerAutoSubmit,
+            setTriggerAutoSubmit
           }}
         >
-          {children}
-        </EditContext.Provider>
-      </ExamContext.Provider>
+          <EditContext.Provider
+            value={{
+              isOpen,
+              textNoteCompletion,
+              setTextNoteCompletion,
+              setData,
+              setIsOpen,
+              setType,
+              type,
+              data
+            }}
+          >
+            {children}
+          </EditContext.Provider>
+        </ExamContext.Provider>
       </HighlightProvider>
     </UserProvider>
   );

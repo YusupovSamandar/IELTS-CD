@@ -6,10 +6,10 @@ import { ExamContext } from '@/global/exam-context';
 import { useExamHandler } from '@/global/use-exam-handler';
 import { MultiMoreExtended } from '@/types/test-exam';
 import { cn } from '@/lib/utils';
+import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 import { ActionButton } from '@/components/test-exam/action-button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 
 export const MultiMoreRender = ({
   multiMore
@@ -72,7 +72,7 @@ export const MultiMoreRender = ({
         >
           {multiMore.question.questionNumber}
         </p>
-        <HighlightableWrapper 
+        <HighlightableWrapper
           elementId={`question-${multiMore.question.id}-title`}
         >
           {multiMore.title}
@@ -100,9 +100,7 @@ export const MultiMoreRender = ({
                 id={choice.id}
               />
               <Label htmlFor={choice.id} className="py-4 w-full cursor-pointer">
-                <HighlightableWrapper 
-                  elementId={`choice-${choice.id}-content`}
-                >
+                <HighlightableWrapper elementId={`choice-${choice.id}-content`}>
                   {choice.content}
                 </HighlightableWrapper>
               </Label>

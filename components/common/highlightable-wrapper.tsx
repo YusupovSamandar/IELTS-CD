@@ -1,8 +1,15 @@
 'use client';
 
-import { useState, useRef, useEffect, ReactNode, useCallback, useMemo } from 'react';
-import { useHighlight, HighlightRange } from '@/global/highlight-context';
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import { Highlighter } from 'lucide-react';
+import { HighlightRange, useHighlight } from '@/global/highlight-context';
 
 interface HighlightableWrapperProps {
   children: ReactNode;
@@ -10,57 +17,77 @@ interface HighlightableWrapperProps {
   className?: string;
 }
 
-export function HighlightableWrapper({ children, elementId, className = '' }: HighlightableWrapperProps) {
+export function HighlightableWrapper({
+  children,
+  elementId,
+  className = ''
+}: HighlightableWrapperProps) {
   const { highlights, addHighlight, removeHighlight } = useHighlight();
   const [showHighlightButton, setShowHighlightButton] = useState(false);
   const [selectionPosition, setSelectionPosition] = useState({ x: 0, y: 0 });
   const [selectedText, setSelectedText] = useState('');
-  const [tempRange, setTempRange] = useState<{ startOffset: number; endOffset: number } | null>(null);
-  const [pendingHighlight, setPendingHighlight] = useState<{ startOffset: number; endOffset: number } | null>(null);
+  const [tempRange, setTempRange] = useState<{
+    startOffset: number;
+    endOffset: number;
+  } | null>(null);
+  const [pendingHighlight, setPendingHighlight] = useState<{
+    startOffset: number;
+    endOffset: number;
+  } | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const handleTextSelection = useCallback(() => {
     const selection = window.getSelection();
-    if (selection && selection.toString().trim() !== '' && selection.rangeCount > 0) {
+    if (
+      selection &&
+      selection.toString().trim() !== '' &&
+      selection.rangeCount > 0
+    ) {
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
-      
+
       // Check if selection is within this element
       const container = range.commonAncestorContainer;
-      const element = container.nodeType === Node.TEXT_NODE ? container.parentElement : container as Element;
+      const element =
+        container.nodeType === Node.TEXT_NODE
+          ? container.parentElement
+          : (container as Element);
       const isWithinElement = contentRef.current?.contains(element);
-      
+
       if (isWithinElement && contentRef.current) {
         const selectedTextValue = selection.toString().trim();
-        
+
         // Get text offsets relative to this element using a more accurate method
         const getTextOffset = (container: Node, offset: number) => {
           if (!contentRef.current) return 0;
-          
+
           // Create a range from the start of the element to the target position
           const range = document.createRange();
           range.setStart(contentRef.current, 0);
           range.setEnd(container, offset);
-          
+
           // Count text characters, accounting for non-text nodes
           const walker = document.createTreeWalker(
             range.cloneContents(),
             NodeFilter.SHOW_TEXT,
             null
           );
-          
+
           let textLength = 0;
           let node;
-          while (node = walker.nextNode()) {
+          while ((node = walker.nextNode())) {
             textLength += (node.textContent || '').length;
           }
-          
+
           return textLength;
         };
-        
-        const startOffset = getTextOffset(range.startContainer, range.startOffset);
+
+        const startOffset = getTextOffset(
+          range.startContainer,
+          range.startOffset
+        );
         const endOffset = startOffset + selectedTextValue.length;
-        
+
         setSelectedText(selectedTextValue);
         setTempRange({ startOffset, endOffset });
         setPendingHighlight({ startOffset, endOffset });
@@ -82,7 +109,7 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
     if (selectedText && tempRange) {
       const highlightId = `highlight-${Date.now()}-${Math.random()}`;
       const { startOffset, endOffset } = tempRange;
-      
+
       const newHighlight: HighlightRange = {
         id: highlightId,
         text: selectedText,
@@ -90,9 +117,9 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
         startOffset,
         endOffset
       };
-      
+
       addHighlight(elementId, newHighlight);
-      
+
       // Clear selection and hide button
       window.getSelection()?.removeAllRanges();
       setShowHighlightButton(false);
@@ -111,7 +138,7 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
 
     // Clear previous highlights but preserve the text content
     const existingHighlights = element.querySelectorAll('.highlight-mark');
-    existingHighlights.forEach(highlight => {
+    existingHighlights.forEach((highlight) => {
       const parent = highlight.parentNode;
       if (parent) {
         // Replace the highlight with its text content
@@ -119,7 +146,7 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
         parent.replaceChild(textNode, highlight);
       }
     });
-    
+
     // Normalize to merge adjacent text nodes
     element.normalize();
 
@@ -127,9 +154,13 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
     if (elementHighlights.length > 0) {
       // Get all text content with positions, accounting for complex DOM structure
       const getTextNodesWithOffsets = (element: Element) => {
-        const textNodes: Array<{ node: Text; startOffset: number; endOffset: number }> = [];
+        const textNodes: Array<{
+          node: Text;
+          startOffset: number;
+          endOffset: number;
+        }> = [];
         let currentOffset = 0;
-        
+
         const walker = document.createTreeWalker(
           element,
           NodeFilter.SHOW_TEXT,
@@ -142,10 +173,11 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
         );
 
         let node;
-        while (node = walker.nextNode()) {
+        while ((node = walker.nextNode())) {
           const textNode = node as Text;
           const length = textNode.textContent?.length || 0;
-          if (length > 0) { // Only include non-empty text nodes
+          if (length > 0) {
+            // Only include non-empty text nodes
             textNodes.push({
               node: textNode,
               startOffset: currentOffset,
@@ -154,63 +186,80 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
             currentOffset += length;
           }
         }
-        
+
         return textNodes;
       };
 
       const textNodes = getTextNodesWithOffsets(element);
-      
+
       // Sort highlights by start position (descending to process from end to start)
-      const sortedHighlights = [...elementHighlights].sort((a, b) => b.startOffset - a.startOffset);
-      
-      sortedHighlights.forEach(highlight => {
+      const sortedHighlights = [...elementHighlights].sort(
+        (a, b) => b.startOffset - a.startOffset
+      );
+
+      sortedHighlights.forEach((highlight) => {
         // Find which text node(s) contain this highlight
-        const overlappingNodes = textNodes.filter(({ startOffset: nodeStart, endOffset: nodeEnd }) => 
-          highlight.startOffset < nodeEnd && highlight.endOffset > nodeStart
+        const overlappingNodes = textNodes.filter(
+          ({ startOffset: nodeStart, endOffset: nodeEnd }) =>
+            highlight.startOffset < nodeEnd && highlight.endOffset > nodeStart
         );
 
         // Process each overlapping text node
-        overlappingNodes.forEach(({ node, startOffset: nodeStart, endOffset: nodeEnd }) => {
-          const relativeStart = Math.max(0, highlight.startOffset - nodeStart);
-          const relativeEnd = Math.min(node.textContent?.length || 0, highlight.endOffset - nodeStart);
-          
-          if (relativeStart < relativeEnd && node.parentNode && node.textContent) {
-            try {
-              // Only create highlight if this portion hasn't been highlighted yet
-              const nodeText = node.textContent;
-              const highlightText = nodeText.slice(relativeStart, relativeEnd);
-              
-              // Create the highlight range within this text node
-              const range = document.createRange();
-              range.setStart(node, relativeStart);
-              range.setEnd(node, relativeEnd);
-              
-              // Create the highlight mark
-              const mark = document.createElement('mark');
-              mark.className = 'highlight-mark';
-              mark.setAttribute('data-highlight-id', highlight.id);
-              mark.setAttribute('data-element-id', elementId);
-              mark.style.backgroundColor = 'yellow';
-              mark.style.padding = '1px 2px';
-              mark.style.cursor = 'pointer';
-              mark.title = 'Click to remove highlight';
-              
-              // Add hover effects
-              mark.addEventListener('mouseenter', () => {
-                mark.style.backgroundColor = 'orange';
-              });
-              mark.addEventListener('mouseleave', () => {
+        overlappingNodes.forEach(
+          ({ node, startOffset: nodeStart, endOffset: nodeEnd }) => {
+            const relativeStart = Math.max(
+              0,
+              highlight.startOffset - nodeStart
+            );
+            const relativeEnd = Math.min(
+              node.textContent?.length || 0,
+              highlight.endOffset - nodeStart
+            );
+
+            if (
+              relativeStart < relativeEnd &&
+              node.parentNode &&
+              node.textContent
+            ) {
+              try {
+                // Only create highlight if this portion hasn't been highlighted yet
+                const nodeText = node.textContent;
+                const highlightText = nodeText.slice(
+                  relativeStart,
+                  relativeEnd
+                );
+
+                // Create the highlight range within this text node
+                const range = document.createRange();
+                range.setStart(node, relativeStart);
+                range.setEnd(node, relativeEnd);
+
+                // Create the highlight mark
+                const mark = document.createElement('mark');
+                mark.className = 'highlight-mark';
+                mark.setAttribute('data-highlight-id', highlight.id);
+                mark.setAttribute('data-element-id', elementId);
                 mark.style.backgroundColor = 'yellow';
-              });
-              
-              // Surround the range content with the mark
-              range.surroundContents(mark);
-              
-            } catch (error) {
-              console.warn('Could not apply highlight:', error);
+                mark.style.padding = '1px 2px';
+                mark.style.cursor = 'pointer';
+                mark.title = 'Click to remove highlight';
+
+                // Add hover effects
+                mark.addEventListener('mouseenter', () => {
+                  mark.style.backgroundColor = 'orange';
+                });
+                mark.addEventListener('mouseleave', () => {
+                  mark.style.backgroundColor = 'yellow';
+                });
+
+                // Surround the range content with the mark
+                range.surroundContents(mark);
+              } catch (error) {
+                console.warn('Could not apply highlight:', error);
+              }
             }
           }
-        });
+        );
       });
     }
   }, [highlights, elementId]);
@@ -221,7 +270,7 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
 
     const element = contentRef.current;
     const selection = window.getSelection();
-    
+
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
       const span = document.createElement('span');
@@ -229,7 +278,7 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
       span.style.backgroundColor = '#3b82f6';
       span.style.color = 'white';
       span.style.padding = '1px 2px';
-      
+
       try {
         range.surroundContents(span);
       } catch (e) {
@@ -242,18 +291,21 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
     return () => {
       // Clean up pending highlights
       const pendingHighlights = element.querySelectorAll('.pending-highlight');
-      pendingHighlights.forEach(highlight => {
+      pendingHighlights.forEach((highlight) => {
         const parent = highlight.parentNode;
         if (parent) {
-          parent.replaceChild(document.createTextNode(highlight.textContent || ''), highlight);
+          parent.replaceChild(
+            document.createTextNode(highlight.textContent || ''),
+            highlight
+          );
           parent.normalize();
         }
       });
     };
   }, [pendingHighlight]);
 
-  const hasHighlights = useMemo(() => 
-    (highlights.get(elementId)?.length || 0) > 0, 
+  const hasHighlights = useMemo(
+    () => (highlights.get(elementId)?.length || 0) > 0,
     [highlights, elementId]
   );
 
@@ -269,7 +321,7 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
         }
       }
     };
-    
+
     document.addEventListener('click', handleHighlightClick);
     return () => document.removeEventListener('click', handleHighlightClick);
   }, [elementId, removeHighlight]);
@@ -277,8 +329,10 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (!target.closest('.highlight-button') && 
-          !target.classList.contains('highlight-mark')) {
+      if (
+        !target.closest('.highlight-button') &&
+        !target.classList.contains('highlight-mark')
+      ) {
         setTimeout(() => {
           const selection = window.getSelection();
           if (!selection || selection.toString().trim() === '') {
@@ -290,7 +344,7 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
         }, 10);
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -305,7 +359,7 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
           className="highlight-button fixed z-50 bg-yellow-400 hover:bg-yellow-500 text-black px-3 py-1 rounded-md shadow-lg cursor-pointer transition-colors"
           style={{
             left: selectionPosition.x - 50,
-            top: selectionPosition.y - 40,
+            top: selectionPosition.y - 40
           }}
           onClick={handleHighlight}
         >
@@ -316,7 +370,7 @@ export function HighlightableWrapper({ children, elementId, className = '' }: Hi
         </div>
       )}
 
-      <div 
+      <div
         ref={contentRef}
         onMouseUp={handleTextSelection}
         className={`select-text ${className}`}

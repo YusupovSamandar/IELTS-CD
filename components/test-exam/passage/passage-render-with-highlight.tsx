@@ -2,10 +2,14 @@
 
 import { memo } from 'react';
 import { PassageExtended } from '@/types/test-exam';
-import { ActionButton } from '../action-button';
 import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
+import { ActionButton } from '../action-button';
 
-function PassageRenderWithHighlightComponent({ passage }: { passage: PassageExtended }) {
+function PassageRenderWithHighlightComponent({
+  passage
+}: {
+  passage: PassageExtended;
+}) {
   return (
     <div className="flex flex-col gap-4 relative">
       <div className="flex justify-between">
@@ -28,7 +32,7 @@ function PassageRenderWithHighlightComponent({ passage }: { passage: PassageExte
       </div>
 
       {passage.type === 'PASSAGE_SIMPLE' && passage.content && (
-        <HighlightableWrapper 
+        <HighlightableWrapper
           elementId={`passage-simple-${passage.id}`}
           className="whitespace-pre-line"
         >
@@ -56,7 +60,7 @@ function PassageRenderWithHighlightComponent({ passage }: { passage: PassageExte
                 </div>
               </div>
               {passageHeading.content && (
-                <HighlightableWrapper 
+                <HighlightableWrapper
                   elementId={`passage-heading-${passageHeading.id}`}
                   className="whitespace-pre-line"
                 >
@@ -83,9 +87,15 @@ function PassageRenderWithHighlightComponent({ passage }: { passage: PassageExte
 }
 
 // Memoize the component to prevent unnecessary rerenders when timer updates
-export const PassageRenderWithHighlight = memo(PassageRenderWithHighlightComponent, (prevProps, nextProps) => {
-  return prevProps.passage.id === nextProps.passage.id && 
-         prevProps.passage.title === nextProps.passage.title &&
-         prevProps.passage.content === nextProps.passage.content &&
-         JSON.stringify(prevProps.passage.passageHeadingList) === JSON.stringify(nextProps.passage.passageHeadingList);
-});
+export const PassageRenderWithHighlight = memo(
+  PassageRenderWithHighlightComponent,
+  (prevProps, nextProps) => {
+    return (
+      prevProps.passage.id === nextProps.passage.id &&
+      prevProps.passage.title === nextProps.passage.title &&
+      prevProps.passage.content === nextProps.passage.content &&
+      JSON.stringify(prevProps.passage.passageHeadingList) ===
+        JSON.stringify(nextProps.passage.passageHeadingList)
+    );
+  }
+);

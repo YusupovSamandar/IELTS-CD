@@ -11,9 +11,9 @@ import {
   withReact
 } from 'slate-react';
 import { CompletionExtended } from '@/types/test-exam';
+import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 import { ElementRender } from '@/components/common/text-editor/element-render';
 import { LeafRender } from '@/components/common/text-editor/leaf-render/leaf-render';
-import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 
 const CompletionParagraphRender = ({
   completion
@@ -32,7 +32,7 @@ const CompletionParagraphRender = ({
   );
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   return (
-    <HighlightableWrapper 
+    <HighlightableWrapper
       elementId={`completion-${completion.id}`}
       className="slate-editor-wrapper"
     >

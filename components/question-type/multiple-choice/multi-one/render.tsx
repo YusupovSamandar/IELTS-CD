@@ -5,10 +5,10 @@ import { AnswerType, ExamContext } from '@/global/exam-context';
 import { useExamHandler } from '@/global/use-exam-handler';
 import { MultiOneExtended } from '@/types/test-exam';
 import { cn } from '@/lib/utils';
+import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 import { ActionButton } from '@/components/test-exam/action-button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 
 export const MultiOneRender = ({
   multiOne
@@ -40,7 +40,7 @@ export const MultiOneRender = ({
         >
           {multiOne.question.questionNumber}
         </p>
-        <HighlightableWrapper 
+        <HighlightableWrapper
           elementId={`question-${multiOne.question.id}-title`}
         >
           {multiOne.title}
@@ -84,7 +84,7 @@ export const MultiOneRender = ({
                   htmlFor={choice.id}
                   className="py-4 w-full cursor-pointer"
                 >
-                  <HighlightableWrapper 
+                  <HighlightableWrapper
                     elementId={`choice-${choice.id}-content`}
                   >
                     {choice.content}

@@ -6,10 +6,10 @@ import { AnswerType, ExamContext } from '@/global/exam-context';
 import { useExamHandler } from '@/global/use-exam-handler';
 import { YesNoNotGivenExtended } from '@/types/test-exam';
 import { cn } from '@/lib/utils';
+import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 import { ActionButton } from '@/components/test-exam/action-button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 
 export const YesNoNotGivenRender = ({
   yesNoNotGiven
@@ -59,7 +59,7 @@ export const YesNoNotGivenRender = ({
         >
           {yesNoNotGiven.question.questionNumber}
         </p>
-        <HighlightableWrapper 
+        <HighlightableWrapper
           elementId={`question-${yesNoNotGiven.question.id}-title`}
         >
           {yesNoNotGiven.title}

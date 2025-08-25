@@ -3,6 +3,7 @@
 import { memo, useContext } from 'react';
 import { SectionType } from '@prisma/client';
 import { ExamContext } from '@/global/exam-context';
+import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 import { CompletionRender } from '@/components/question-type/completion';
 import { IdentifyInfoRender } from '@/components/question-type/identify-info/render';
 import { LetterAnswerRender } from '@/components/question-type/letter-answer/render';
@@ -11,7 +12,6 @@ import { MultiOneRender } from '@/components/question-type/multiple-choice/multi
 import { YesNoNotGivenRender } from '@/components/question-type/yes-no-not-given/render';
 import { ActionButton } from '@/components/test-exam/action-button';
 import { buttonVariants } from '@/components/ui/button';
-import { HighlightableWrapper } from '@/components/common/highlightable-wrapper';
 import {
   ResizableHandle,
   ResizablePanel,
@@ -48,7 +48,7 @@ const QuestionGroupsSection = memo(
                       Questions {questionGroup.startQuestionNumber}-
                       {questionGroup.endQuestionNumber}
                     </p>
-                    <HighlightableWrapper 
+                    <HighlightableWrapper
                       elementId={`question-group-title-${questionGroup.id}`}
                       className="whitespace-pre-line"
                     >
